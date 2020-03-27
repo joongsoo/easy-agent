@@ -1,6 +1,7 @@
 package software.fitz.easyagent.core.strategy.impl;
 
 import software.fitz.easyagent.core.strategy.TransformStrategy;
+import software.fitz.easyagent.core.util.ClassUtils;
 
 import java.security.ProtectionDomain;
 import java.util.Map;
@@ -13,7 +14,8 @@ public class NameBaseTransformStrategy implements TransformStrategy {
     private String internalClassName;
     private boolean applyChild;
 
-    public NameBaseTransformStrategy(String internalClassNamePattern) {
+    public NameBaseTransformStrategy(String classNamePattern) {
+        String internalClassNamePattern = ClassUtils.toInternalName(classNamePattern);
 
         this.applyChild = internalClassNamePattern.endsWith("+");
 
@@ -29,7 +31,12 @@ public class NameBaseTransformStrategy implements TransformStrategy {
     @Override
     public boolean isTransformTarget(ClassLoader loader, String className, Class<?> classBeingRedefined,
                                      ProtectionDomain protectionDomain, byte[] classfileBuffer, String superClassName, String[] interfaces) {
-        return this.internalClassName.equals(internalClassName)
+
+        if (className != null && className.contains("fitz")) {
+            System.err.println(className + " / " + internalClassName);
+        }
+
+        return this.internalClassName.equals(className)
                 || (this.applyChild && registerIfChild(internalClassName, superClassName, interfaces));
     }
 

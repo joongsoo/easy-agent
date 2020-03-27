@@ -31,9 +31,6 @@ public class EasyAgentBootstrap {
     }
 
     public void start() {
-        if (agentArgs == null) {
-            throw new IllegalStateException("agentArgs must not be null!");
-        }
 
         if (inst == null) {
             throw new IllegalStateException("Instrumentation must not be null!");

@@ -3,6 +3,7 @@ package software.fitz.easyagent.core.asm;
 import software.fitz.easyagent.core.asm.helper.InterceptorByteCodeHelper;
 import software.fitz.easyagent.core.asm.helper.ByteCodeHelper;
 import software.fitz.easyagent.core.interceptor.AroundInterceptor;
+import software.fitz.easyagent.core.interceptor.InterceptorRegistry;
 import software.fitz.easyagent.core.model.InstrumentMethod;
 import software.fitz.easyagent.core.util.ClassUtils;
 import software.fitz.easyagent.core.model.InstrumentClass;
@@ -150,7 +151,7 @@ public class AddProxyClassVisitor extends ClassVisitor {
 
                 mv.visitFieldInsn(GETSTATIC, classInfo.getInternalName(), interceptorFieldName, "Ljava/util/ArrayList;");
                 mv.visitIntInsn(BIPUSH, interceptor.getInterceptorId());
-                mv.visitMethodInsn(INVOKESTATIC, "software/fitz/easyagent/interceptor/InterceptorRegistry", "findInterceptor", "(I)L" + AroundInterceptor.INTERNAL_NAME + ";", false);
+                mv.visitMethodInsn(INVOKESTATIC, InterceptorRegistry.INTERNAL_NAME, "findInterceptor", "(I)L" + AroundInterceptor.INTERNAL_NAME + ";", false);
                 mv.visitMethodInsn(INVOKEVIRTUAL, "java/util/ArrayList", "add", "(Ljava/lang/Object;)Z", false);
                 mv.visitInsn(POP);
             }
