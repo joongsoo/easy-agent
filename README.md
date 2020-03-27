@@ -42,8 +42,8 @@ public class YourPlugin implements Plugin {
                 TransformDefinition.builder()
                         // "+" means applies to all classes that extend this class
                         .transformStrategy(TransformStrategy.className("package.Class+")) 
-                        .targetMethodName("aa")
-                        .addInterceptor(TestInterceptor.class)
+                        .targetMethodName("methodName")
+                        .addInterceptor(YourInterceptor.class)
                         .build()
         );
     }
@@ -101,3 +101,38 @@ public class PremainClass {
 
 #### (6) Run with your application
 `java -javaagent:your/path/{your-jar-name}.jar -jar your-application.jar`
+
+
+## Example
+Replace method argument example.
+
+#### AroundInterceptor
+```java
+public class YourInterceptor implements AroundInterceptor {
+
+    @Override
+    public Object[] before(Object target, Object[] args) {
+        if (args[0] != null && args[0] instanceof String) {
+            args[0] = args[0] + " Hi!";
+        }
+        return args;
+    }
+}
+```
+
+#### Target class & Main class
+```java
+public class TargetClass {
+    
+    public void printName(String name) {
+        System.out.println(name); 
+    }
+
+    public static void main(String[] args) {
+        new TargetClass().printName("joongsoo");
+    }
+}
+```
+
+#### Execute result
+`> joongsoo Hi!`
