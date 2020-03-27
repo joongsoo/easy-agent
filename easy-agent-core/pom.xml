@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>software.fitz</groupId>
+        <artifactId>easy-agent</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>easy-agent-core</artifactId>
+    <packaging>jar</packaging>
+
+    <properties>
+        <asm.version>5.2</asm.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>software.fitz</groupId>
+            <artifactId>easy-agent-api</artifactId>
+            <version>0.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm</artifactId>
+            <version>${asm.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm-commons</artifactId>
+            <version>${asm.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm-util</artifactId>
+            <version>${asm.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
+        <testSourceDirectory>${project.basedir}/src/test/java</testSourceDirectory>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.2</version>
+                <configuration>
+                    <compilerVersion>${java.version}</compilerVersion>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.2</version>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>easy-agent</finalName>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <archive>
+                                <manifest>
+                                    <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                                    <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                                </manifest>
+                                <manifestEntries>
+                                    <Premain-Class>com.hpcnt.agent.kube.Bootstrap</Premain-Class>
+                                    <Can-Retransform-Classes>true</Can-Retransform-Classes>
+                                    <Can-Redefine-Classes>true</Can-Redefine-Classes>
+                                    <Boot-Class-Path>easy-agent.jar</Boot-Class-Path>
+                                </manifestEntries>
+                            </archive>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
