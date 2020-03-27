@@ -28,7 +28,7 @@ public class InterceptorByteCodeHelper {
 
     public static void generateBeforeDelegateMethod(InstrumentClass classInfo, ClassVisitor cv, String interceptorFieldName, String delegateMethodName) {
 
-        System.err.println("[EASY_AGENT][" + classInfo.getName() + "] Generate around method : " + delegateMethodName);
+        System.err.println("[EASY_AGENT][" + classInfo.getName() + "] Generate method : " + delegateMethodName);
 
         MethodVisitor methodVisitor = cv.visitMethod(ACC_PRIVATE | ACC_VARARGS, delegateMethodName, "([Ljava/lang/Object;)[Ljava/lang/Object;", null, null);
         methodVisitor.visitParameter("args", 0);
@@ -115,7 +115,7 @@ public class InterceptorByteCodeHelper {
 
     public static void generateAfterDelegateMethod(InstrumentClass classInfo, ClassVisitor cv, String interceptorFieldName, String delegateMethodName) {
 
-        System.err.println("[EASY_AGENT][" + classInfo.getName() + "] Generate around method : " + delegateMethodName);
+        System.err.println("[EASY_AGENT][" + classInfo.getName() + "] Generate method : " + delegateMethodName);
 
         MethodVisitor methodVisitor = cv.visitMethod(ACC_PRIVATE | ACC_VARARGS, delegateMethodName, "([Ljava/lang/Object;)V", null, null);
         methodVisitor.visitParameter("args", 0);

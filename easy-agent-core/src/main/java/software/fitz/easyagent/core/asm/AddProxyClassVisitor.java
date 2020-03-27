@@ -80,7 +80,7 @@ public class AddProxyClassVisitor extends ClassVisitor {
     public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
         // static field init
         if (!isInterface && "<clinit>".equals(name) &&  !visitedStaticBlock) {
-            System.err.println("[EASY_AGENT][" + classInfo.getName() + "] Init static field");
+            System.err.println("[EASY_AGENT][" + classInfo.getName() + "] Generate static field");
 
             visitedStaticBlock = true;
             MethodVisitor visitor = cv.visitMethod(access, name, descriptor, signature, exceptions);
