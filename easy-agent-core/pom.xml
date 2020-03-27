@@ -74,7 +74,7 @@
                                     <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                                 </manifest>
                                 <manifestEntries>
-                                    <Premain-Class>com.hpcnt.agent.kube.Bootstrap</Premain-Class>
+                                    <Premain-Class>software.fitz.Bootstrap</Premain-Class>
                                     <Can-Retransform-Classes>true</Can-Retransform-Classes>
                                     <Can-Redefine-Classes>true</Can-Redefine-Classes>
                                     <Boot-Class-Path>easy-agent.jar</Boot-Class-Path>
