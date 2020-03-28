@@ -4,8 +4,8 @@ A library for Java agents that makes it very easy to inject proxies into classes
 ## Documentation
 If you want see more info. See [Github wiki documentation](https://github.com/joongsoo/easy-agent/wiki)
 
-## Extends
-You can developing your own reusable easy-agent plugin. it is very simple. [See more details](https://github.com/joongsoo/easy-agent/wiki/Plugin)
+## Extend via plugin
+You can developing reusable easy-agent plugin. it is very simple. [See more details](https://github.com/joongsoo/easy-agent/wiki/Plugin)
 
 ## How to use
 Just follow 6 simple steps.
