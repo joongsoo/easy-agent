@@ -5,12 +5,12 @@
     <parent>
         <groupId>software.fitz</groupId>
         <artifactId>easy-agent</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.1.0-RELEASE</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>easy-agent-api</artifactId>
-    <version>0.1.0</version>
+    <version>0.1.0-RELEASE</version>
     <packaging>jar</packaging>
 
     <build>
@@ -27,6 +27,49 @@
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.3</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

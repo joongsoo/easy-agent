@@ -9,7 +9,7 @@ A library for Java agents that makes it very easy to inject proxies into classes
 
 
 ## Documentation
-If you want see more info. See [Github wiki documentation](https://github.com/joongsoo/easy-agent/wiki)
+If you want see more info about this module, See [Github wiki documentation](https://github.com/joongsoo/easy-agent/wiki)
 
 ## Extend via plugin
 You can developing reusable easy-agent plugin. it is very simple. [See more details](https://github.com/joongsoo/easy-agent/wiki/Plugin)
@@ -22,7 +22,7 @@ Just follow 6 simple steps.
 <dependency>
     <groupId>software.fitz</groupId>
     <artifactId>easy-agent-core</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.1.0-RELEASE</version>
 </dependency>
 ```
 

@@ -5,7 +5,7 @@
 
     <groupId>software.fitz</groupId>
     <artifactId>easy-agent</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.1.0-RELEASE</version>
 
     <modules>
         <module>easy-agent-core</module>
@@ -15,8 +15,67 @@
     <name>easy-agent</name>
     <description>Easy proxy bytecode injector at the bytecode level.</description>
     <packaging>pom</packaging>
+    <url>https://github.com/joongsoo/easy-agent</url>
+
+    <licenses>
+        <license>
+            <name>apache-2.0</name>
+            <url>https://opensource.org/licenses/Apache-2.0</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <url>https://github.com/joongsoo/easy-agent</url>
+    </scm>
+
+    <developers>
+        <developer>
+            <id>joongsoo</id>
+            <name>Joongsoo Park (Fitz)</name>
+            <email>wndtn853@gmail.com</email>
+            <organization>Fitz</organization>
+            <organizationUrl>https://fitz.software/</organizationUrl>
+            <roles>
+                <role>Architect</role>
+                <role>Developer</role>
+            </roles>
+            <timezone>+9</timezone>
+        </developer>
+    </developers>
 
     <properties>
         <java.version>1.8</java.version>
     </properties>
+
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
