@@ -1,7 +1,7 @@
-package software.fitz.easyagent.core.interceptor;
+package software.fitz.easyagent.api.interceptor;
 
 public interface AroundInterceptor {
-    String INTERNAL_NAME = "software/fitz/easyagent/core/interceptor/AroundInterceptor";
+    String INTERNAL_NAME = "software/fitz/easyagent/api/interceptor/AroundInterceptor";
 
     /**
      *

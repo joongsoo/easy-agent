@@ -1,6 +1,6 @@
-package software.fitz.easyagent.core.strategy;
+package software.fitz.easyagent.api.strategy;
 
-import software.fitz.easyagent.core.strategy.impl.NameBaseTransformStrategy;
+import software.fitz.easyagent.api.strategy.impl.NameBaseTransformStrategy;
 
 import java.security.ProtectionDomain;
 

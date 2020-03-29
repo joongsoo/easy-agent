@@ -3,7 +3,7 @@ package software.fitz.easyagent.core.transformer;
 import software.fitz.easyagent.core.asm.ASMContext;
 import software.fitz.easyagent.core.classloader.AgentClassLoader;
 import software.fitz.easyagent.core.asm.AddProxyClassVisitor;
-import software.fitz.easyagent.core.interceptor.AroundInterceptor;
+import software.fitz.easyagent.api.interceptor.AroundInterceptor;
 import software.fitz.easyagent.core.interceptor.InterceptorRegistry;
 import software.fitz.easyagent.core.model.InstrumentClass;
 import software.fitz.easyagent.core.model.InterceptorDefinition;

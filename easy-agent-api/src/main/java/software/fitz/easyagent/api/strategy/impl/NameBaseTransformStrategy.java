@@ -1,7 +1,7 @@
-package software.fitz.easyagent.core.strategy.impl;
+package software.fitz.easyagent.api.strategy.impl;
 
-import software.fitz.easyagent.core.strategy.TransformStrategy;
-import software.fitz.easyagent.core.util.ClassUtils;
+import software.fitz.easyagent.api.strategy.TransformStrategy;
+import software.fitz.easyagent.api.util.ClassUtils;
 
 import java.security.ProtectionDomain;
 import java.util.Map;

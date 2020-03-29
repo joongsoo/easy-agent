@@ -1,6 +1,6 @@
 package software.fitz.easyagent.core.asm.helper;
 
-import software.fitz.easyagent.core.util.ClassUtils;
+import software.fitz.easyagent.api.util.ClassUtils;
 import org.objectweb.asm.MethodVisitor;
 
 import static org.objectweb.asm.Opcodes.ALOAD;

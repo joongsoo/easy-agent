@@ -1,7 +1,7 @@
 package software.fitz.easyagent.core.model;
 
-import software.fitz.easyagent.core.TransformDefinition;
-import software.fitz.easyagent.core.strategy.TransformStrategy;
+import software.fitz.easyagent.api.TransformDefinition;
+import software.fitz.easyagent.api.strategy.TransformStrategy;
 
 import java.util.List;
 import java.util.stream.Collectors;

@@ -1,7 +1,7 @@
 package software.fitz.easyagent.core;
 
 import software.fitz.easyagent.core.model.InternalTransformDefinition;
-import software.fitz.easyagent.core.strategy.TransformStrategy;
+import software.fitz.easyagent.api.strategy.TransformStrategy;
 import software.fitz.easyagent.core.transformer.TransformerDelegate;
 import org.objectweb.asm.ClassReader;
 

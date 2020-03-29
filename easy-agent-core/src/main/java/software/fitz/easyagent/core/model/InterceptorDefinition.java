@@ -1,6 +1,6 @@
 package software.fitz.easyagent.core.model;
 
-import software.fitz.easyagent.core.interceptor.AroundInterceptor;
+import software.fitz.easyagent.api.interceptor.AroundInterceptor;
 
 public class InterceptorDefinition {
     private Integer interceptorId;

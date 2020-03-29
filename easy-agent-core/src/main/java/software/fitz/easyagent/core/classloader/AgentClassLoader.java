@@ -1,6 +1,6 @@
 package software.fitz.easyagent.core.classloader;
 
-import software.fitz.easyagent.core.util.ClassUtils;
+import software.fitz.easyagent.api.util.ClassUtils;
 import software.fitz.easyagent.core.util.IOUtils;
 
 import java.io.IOException;

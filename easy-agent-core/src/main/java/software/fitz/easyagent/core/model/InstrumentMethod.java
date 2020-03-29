@@ -1,6 +1,6 @@
 package software.fitz.easyagent.core.model;
 
-import software.fitz.easyagent.core.util.ClassUtils;
+import software.fitz.easyagent.api.util.ClassUtils;
 
 public class InstrumentMethod {
     private int access;

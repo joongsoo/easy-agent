@@ -1,5 +1,6 @@
 package software.fitz.easyagent.core;
 
+import software.fitz.easyagent.api.Plugin;
 import software.fitz.easyagent.core.transformer.InjectProxyTransformerDelegate;
 import software.fitz.easyagent.core.transformer.TransformerDelegate;
 

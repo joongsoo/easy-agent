@@ -2,10 +2,10 @@ package software.fitz.easyagent.core.asm;
 
 import software.fitz.easyagent.core.asm.helper.InterceptorByteCodeHelper;
 import software.fitz.easyagent.core.asm.helper.ByteCodeHelper;
-import software.fitz.easyagent.core.interceptor.AroundInterceptor;
+import software.fitz.easyagent.api.interceptor.AroundInterceptor;
 import software.fitz.easyagent.core.interceptor.InterceptorRegistry;
 import software.fitz.easyagent.core.model.InstrumentMethod;
-import software.fitz.easyagent.core.util.ClassUtils;
+import software.fitz.easyagent.api.util.ClassUtils;
 import software.fitz.easyagent.core.model.InstrumentClass;
 import software.fitz.easyagent.core.model.InterceptorDefinition;
 import org.objectweb.asm.ClassVisitor;

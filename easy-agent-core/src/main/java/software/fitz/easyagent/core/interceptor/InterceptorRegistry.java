@@ -1,5 +1,7 @@
 package software.fitz.easyagent.core.interceptor;
 
+import software.fitz.easyagent.api.interceptor.AroundInterceptor;
+
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;

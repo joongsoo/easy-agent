@@ -1,4 +1,4 @@
-package software.fitz.easyagent.core;
+package software.fitz.easyagent.api;
 
 public interface Plugin {
 

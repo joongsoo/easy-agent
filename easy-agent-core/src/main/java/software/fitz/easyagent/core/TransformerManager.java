@@ -1,5 +1,7 @@
 package software.fitz.easyagent.core;
 
+import software.fitz.easyagent.api.TransformDefinition;
+import software.fitz.easyagent.api.TransformerRegistry;
 import software.fitz.easyagent.core.model.InternalTransformDefinition;
 
 import java.util.List;

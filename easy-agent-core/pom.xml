@@ -21,7 +21,7 @@
         <dependency>
             <groupId>software.fitz</groupId>
             <artifactId>easy-agent-api</artifactId>
-            <version>0.1.0</version>
+            <version>0.1.0-RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.ow2.asm</groupId>

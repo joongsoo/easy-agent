@@ -1,7 +1,7 @@
-package software.fitz.easyagent.core;
+package software.fitz.easyagent.api;
 
-import software.fitz.easyagent.core.interceptor.AroundInterceptor;
-import software.fitz.easyagent.core.strategy.TransformStrategy;
+import software.fitz.easyagent.api.interceptor.AroundInterceptor;
+import software.fitz.easyagent.api.strategy.TransformStrategy;
 
 import java.util.ArrayList;
 import java.util.List;

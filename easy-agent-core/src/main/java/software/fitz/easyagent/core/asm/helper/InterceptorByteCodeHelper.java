@@ -1,7 +1,6 @@
 package software.fitz.easyagent.core.asm.helper;
 
-import software.fitz.easyagent.core.asm.helper.TryCatchHelper;
-import software.fitz.easyagent.core.interceptor.AroundInterceptor;
+import software.fitz.easyagent.api.interceptor.AroundInterceptor;
 import software.fitz.easyagent.core.interceptor.handler.ExceptionPublisher;
 import software.fitz.easyagent.core.model.InstrumentClass;
 import org.objectweb.asm.ClassVisitor;
