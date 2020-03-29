@@ -64,6 +64,9 @@ public class PremainClass {
 ```
 
 #### (5) Add maven plugin to your pom.xml
+1. Replace `{your-jar-name}` with the name of the jar you want.
+2. Replace `{package.to.premain-class}` with a class that implements the `premain` method.
+
 ```xml
 <plugin>
     <artifactId>maven-assembly-plugin</artifactId>
@@ -100,11 +103,15 @@ public class PremainClass {
 ```
 
 #### (6) Run with your application
-`java -javaagent:your/path/{your-jar-name}.jar -jar your-application.jar`
+Specify your agent jar in the `-javaagent` argument.
+
+```
+java -javaagent:/path/{your-jar-name}.jar -jar target-application.jar
+```
 
 
 ## Example
-Replace method argument example.
+Example of replacing method arguments.
 
 #### AroundInterceptor
 ```java
@@ -116,6 +123,26 @@ public class YourInterceptor implements AroundInterceptor {
             args[0] = args[0] + " Hi!";
         }
         return args;
+    }
+}
+```
+
+#### Plugin
+The process of registering the module was omitted.
+
+```java
+public class YourPlugin implements Plugin {
+
+    @Override
+    public void setup(TransformerRegistry transformerRegistry) {
+
+        transformerRegistry.register(
+                TransformDefinition.builder()
+                        .transformStrategy(TransformStrategy.className("package.TargetClass")) 
+                        .targetMethodName("printName")
+                        .addInterceptor(YourInterceptor.class)
+                        .build()
+        );
     }
 }
 ```
