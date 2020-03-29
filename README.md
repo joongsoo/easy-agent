@@ -174,4 +174,6 @@ public class TargetClass {
 ```
 
 #### Execute result
-`> joongsoo Hi!`
+```
+joongsoo Hi!
+```
