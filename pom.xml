@@ -36,10 +36,6 @@
             <email>wndtn853@gmail.com</email>
             <organization>Fitz</organization>
             <organizationUrl>https://fitz.software/</organizationUrl>
-            <roles>
-                <role>Architect</role>
-                <role>Developer</role>
-            </roles>
             <timezone>+9</timezone>
         </developer>
     </developers>
