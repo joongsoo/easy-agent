@@ -22,7 +22,7 @@ Just follow 6 simple steps.
 <dependency>
     <groupId>software.fitz</groupId>
     <artifactId>easy-agent-core</artifactId>
-    <version>0.1.0-RELEASE</version>
+    <version>0.2.0-RELEASE</version>
 </dependency>
 ```
 

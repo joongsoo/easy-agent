@@ -5,7 +5,7 @@
 
     <groupId>software.fitz</groupId>
     <artifactId>easy-agent</artifactId>
-    <version>0.1.0-RELEASE</version>
+    <version>0.2.0-RELEASE</version>
 
     <modules>
         <module>easy-agent-core</module>
