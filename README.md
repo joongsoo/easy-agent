@@ -1,12 +1,37 @@
 # easy-agent
-A library for Java agents that makes it very easy to inject proxies into classes at the bytecode level.
+This library was created to easily develop a Java agent that injects proxy code into the class bytecode.
+
+If you write code in Java without needing to know the [bytecode instrumentation](https://docs.oracle.com/javase/8/docs/technotes/guides/instrumentation/index.html), it is injected into bytecode.
+
+Bytecode transforming writed using [ASM](https://asm.ow2.io/). so it is fast.
+
 
 ## Table of content
+- [Summary](#summary)
 - [Documentation](#documentation)
 - [Extend via plugin](#extend-via-plugin)
 - [How to use](#how-to-use)
 - [Example](#example)
 
+## Summary
+From an architectural point of view, the Java agent is a good way to inject logic from outside your application.
+
+Many applications are increasingly using cloud and virtualized environments. In that case, there are times when you need to write code that is infrastructure dependent.
+
+For example, if you need to implement [istio distributed tracing](https://istio.io/docs/tasks/observability/distributed-tracing/overview/),
+You will write code to propagate HTTP headers inside your application.
+
+However, if you write like this, your application will depend to [istio](https://istio.io/).
+
+If using java agent, infrastructure dependent logic can be managed at the infrastructure level.
+
+![image](https://user-images.githubusercontent.com/15869525/78053714-f41f6c00-73bb-11ea-8ce1-f15fb039bd6e.png)
+
+[easy-agent](https://github.com/joongsoo/easy-agent) helps you develop java agent easily. it is
+- Fast : `easy-agent` uses [ASM](https://asm.ow2.io/), a low-level library.
+- Easy : You don't need to know bytecode transform. You can easily inject a proxy with simple java code.
+- Extension : `easy-agent` provides a `easy-agent-api` that can be easily extended. You can easily develop reusable plugins.
+- Documentation : We try to give you the most detailed and friendly documentation possible. If there is any room for improvement in the document, please make a suggestion.
 
 ## Documentation
 If you want see more info about this module, See [Github wiki documentation](https://github.com/joongsoo/easy-agent/wiki)
@@ -27,17 +52,28 @@ Just follow 6 simple steps.
 ```
 
 #### (2) Implements AroundInterceptor
+Override only necessary methods.
+
 ```java
 public class YourInterceptor implements AroundInterceptor {
 
     @Override
     public Object[] before(Object target, Object[] args) {
         // your proxy code
-        return args; // possible replace to target method arguments
+        if (args[0] instanceof String) {
+            args[0] = args[0] + " hi"; // possible replace to target method arguments
+        }
+        return args;
     }
 
     @Override
-    public void after(Object target, Object[] args) {
+    public Object after(Object target, Object returnedValue, Object[] args) {
+        // your proxy code
+        return returnedValue; // possible replace to return value
+    }
+
+    @Override
+    public void thrown(Object target, Throwable t, Object[] args) {
         // your proxy code
     }
 }
@@ -118,7 +154,7 @@ public class PremainClass {
 Specify your agent jar in the `-javaagent` argument.
 
 ```
-java -javaagent:/path/{your-jar-name}.jar -jar target-application.jar
+java -javaagent:/path/{your-agent}.jar -jar target-application.jar
 ```
 
 
