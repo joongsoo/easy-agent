@@ -20,6 +20,8 @@ import static org.objectweb.asm.Opcodes.ACC_FINAL;
 import static org.objectweb.asm.Opcodes.ACC_PRIVATE;
 import static org.objectweb.asm.Opcodes.ACC_STATIC;
 import static org.objectweb.asm.Opcodes.RETURN;
+import static software.fitz.easyagent.api.interceptor.AroundInterceptor.AFTER_METHOD_DESCRIPTOR;
+import static software.fitz.easyagent.api.interceptor.AroundInterceptor.BEFORE_METHOD_DESCRIPTOR;
 
 public class AddProxyClassVisitor extends ClassVisitor {
 
@@ -194,7 +196,7 @@ public class AddProxyClassVisitor extends ClassVisitor {
             }
 
             // Call interceptor before method
-            mv.visitMethodInsn(INVOKESPECIAL, classInfo.getInternalName(), delegateBefore, "([Ljava/lang/Object;)[Ljava/lang/Object;", false);
+            mv.visitMethodInsn(INVOKESTATIC, classInfo.getInternalName(), delegateBefore, BEFORE_METHOD_DESCRIPTOR, false);
 
             // Replace method arguments to before method return values.
             // This bytecode does not affect the code of the target method.
@@ -215,26 +217,50 @@ public class AddProxyClassVisitor extends ClassVisitor {
 
         @Override
         protected void onMethodExit(int opcode) {
-            // Define array for store method arguments.
-            mv.visitVarInsn(ALOAD, 0);
-            mv.visitIntInsn(BIPUSH, argCount);
-            mv.visitTypeInsn(ANEWARRAY, "java/lang/Object");
+            // Run only return.
+            // Stack snapshot : [returnedValue]
+            if (opcode != ATHROW) {
 
-            // Store method arguments to array.
-            for (int i=0; i<argCount; i++) {
-                String argDesc = instrumentMethod.getArgTypeDescriptors()[i];
+                // Load "this" to stack for call "after" method.
+                // Stack snapshot : [returnedValue, this]
+                mv.visitVarInsn(ALOAD, 0);
 
-                mv.visitInsn(DUP);
-                mv.visitIntInsn(BIPUSH, i);
-                ByteCodeHelper.loadLocalVariableToStack(mv, i+1, argDesc);
-                if (ClassUtils.isPrimitiveType(argDesc)) {
-                    ByteCodeHelper.boxingPrimitiveType(mv, argDesc);
+                if (opcode == RETURN) {
+                    // Stack snapshot : [this, null]
+                    mv.visitInsn(ACONST_NULL);
+                } else {
+                    // Swap between "this" and "returnedValue"
+                    // Stack snapshot : [this, returnedValue]
+                    mv.visitInsn(SWAP);
                 }
-                mv.visitInsn(AASTORE);
-            }
 
-            // Call interceptor before method
-            mv.visitMethodInsn(INVOKESPECIAL, classInfo.getInternalName(), delegateAfter, "([Ljava/lang/Object;)V", false);
+                // Define array for store method arguments.
+                // Stack snapshot : [this, returnedValue, args]
+                mv.visitIntInsn(BIPUSH, argCount);
+                mv.visitTypeInsn(ANEWARRAY, "java/lang/Object");
+
+                // Store method arguments to array.
+                for (int i = 0; i < argCount; i++) {
+                    String argDesc = instrumentMethod.getArgTypeDescriptors()[i];
+
+                    mv.visitInsn(DUP);
+                    mv.visitIntInsn(BIPUSH, i);
+                    ByteCodeHelper.loadLocalVariableToStack(mv, i + 1, argDesc);
+                    if (ClassUtils.isPrimitiveType(argDesc)) {
+                        ByteCodeHelper.boxingPrimitiveType(mv, argDesc);
+                    }
+                    mv.visitInsn(AASTORE);
+                }
+
+                // Call interceptor before method
+                // Stack snapshot : [returnedValue] -> The final value returned.
+                mv.visitMethodInsn(INVOKESTATIC, classInfo.getInternalName(), delegateAfter, AFTER_METHOD_DESCRIPTOR, false);
+
+                // If return type is void, remove it.
+                if (opcode == RETURN) {
+                    mv.visitInsn(POP);
+                }
+            }
         }
 
         @Override

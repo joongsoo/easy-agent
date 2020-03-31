@@ -2,6 +2,10 @@ package software.fitz.easyagent.api.interceptor;
 
 public interface AroundInterceptor {
     String INTERNAL_NAME = "software/fitz/easyagent/api/interceptor/AroundInterceptor";
+    String BEFORE_METHOD_NAME = "before";
+    String BEFORE_METHOD_DESCRIPTOR = "(Ljava/lang/Object;[Ljava/lang/Object;)[Ljava/lang/Object;";
+    String AFTER_METHOD_NAME = "after";
+    String AFTER_METHOD_DESCRIPTOR = "(Ljava/lang/Object;Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;";
 
     /**
      *
@@ -13,7 +17,7 @@ public interface AroundInterceptor {
         return args;
     }
 
-    default void after(Object target, Object[] args) {
-
+    default Object after(Object target, Object returnedValue, Object[] args) {
+        return returnedValue;
     }
 }
