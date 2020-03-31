@@ -22,10 +22,13 @@ import static org.objectweb.asm.Opcodes.IFEQ;
 import static org.objectweb.asm.Opcodes.INVOKEINTERFACE;
 import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
+import static org.objectweb.asm.Opcodes.RETURN;
 import static software.fitz.easyagent.api.interceptor.AroundInterceptor.AFTER_METHOD_DESCRIPTOR;
 import static software.fitz.easyagent.api.interceptor.AroundInterceptor.AFTER_METHOD_NAME;
 import static software.fitz.easyagent.api.interceptor.AroundInterceptor.BEFORE_METHOD_DESCRIPTOR;
 import static software.fitz.easyagent.api.interceptor.AroundInterceptor.BEFORE_METHOD_NAME;
+import static software.fitz.easyagent.api.interceptor.AroundInterceptor.THROWN_METHOD_DESCRIPTOR;
+import static software.fitz.easyagent.api.interceptor.AroundInterceptor.THROWN_METHOD_NAME;
 
 public class InterceptorByteCodeHelper {
 
@@ -110,7 +113,7 @@ public class InterceptorByteCodeHelper {
         methodVisitor.visitLocalVariable("ai", "L"+AroundInterceptor.INTERNAL_NAME+";", null, tryCatchHelper.getStart(), label7, 4);
         methodVisitor.visitLocalVariable("target", "L"+classInfo.getInternalName()+";", null, label3, label9, 0);
         methodVisitor.visitLocalVariable("args", "[Ljava/lang/Object;", null, label3, label9, 1);
-        methodVisitor.visitLocalVariable("real", "[Ljava/lang/Object;", null, label4, label9, 2);
+        methodVisitor.visitLocalVariable("changed", "[Ljava/lang/Object;", null, label4, label9, 2);
 
         methodVisitor.visitMaxs(3, 6);
         methodVisitor.visitEnd();
@@ -192,6 +195,75 @@ public class InterceptorByteCodeHelper {
         methodVisitor.visitLocalVariable("returnedValue", "Ljava/lang/Object;", null, label3, label8, 1);
         methodVisitor.visitLocalVariable("args", "[Ljava/lang/Object;", null, label3, label8, 2);
 
+        methodVisitor.visitMaxs(4, 6);
+        methodVisitor.visitEnd();
+    }
+
+    public static void generateThrownDelegateMethod(InstrumentClass classInfo, ClassVisitor cv, String interceptorFieldName, String delegateMethodName) {
+
+        System.err.println("[EASY_AGENT][" + classInfo.getName() + "] Generate method : " + delegateMethodName);
+
+        MethodVisitor methodVisitor = cv.visitMethod(ACC_PRIVATE | ACC_FINAL | ACC_STATIC | ACC_VARARGS, delegateMethodName, THROWN_METHOD_DESCRIPTOR, null, null);
+        methodVisitor.visitCode();
+
+        TryCatchHelper tryCatchHelper = new TryCatchHelper();
+
+        methodVisitor.visitTryCatchBlock(tryCatchHelper.getStart(), tryCatchHelper.getEnd(), tryCatchHelper.getHandler(), "java/lang/Throwable");
+        Label label3 = new Label();
+        methodVisitor.visitLabel(label3);
+        methodVisitor.visitFieldInsn(GETSTATIC, classInfo.getInternalName(), interceptorFieldName, "Ljava/util/ArrayList;");
+        methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "java/util/ArrayList", "iterator", "()Ljava/util/Iterator;", false);
+        methodVisitor.visitVarInsn(ASTORE, 3);
+
+        Label label4 = new Label();
+        methodVisitor.visitLabel(label4);
+        methodVisitor.visitFrame(Opcodes.F_APPEND, 1, new Object[]{"java/util/Iterator"}, 0, null);
+        methodVisitor.visitVarInsn(ALOAD, 3);
+        methodVisitor.visitMethodInsn(INVOKEINTERFACE, "java/util/Iterator", "hasNext", "()Z", true);
+
+        Label label5 = new Label();
+        methodVisitor.visitJumpInsn(IFEQ, label5);
+        methodVisitor.visitVarInsn(ALOAD, 3);
+        methodVisitor.visitMethodInsn(INVOKEINTERFACE, "java/util/Iterator", "next", "()Ljava/lang/Object;", true);
+        methodVisitor.visitTypeInsn(CHECKCAST, AroundInterceptor.INTERNAL_NAME);
+        methodVisitor.visitVarInsn(ASTORE, 4);
+
+        methodVisitor.visitLabel(tryCatchHelper.getStart());
+        methodVisitor.visitVarInsn(ALOAD, 4);
+        methodVisitor.visitVarInsn(ALOAD, 0);
+        methodVisitor.visitVarInsn(ALOAD, 1);
+        methodVisitor.visitVarInsn(ALOAD, 2);
+        methodVisitor.visitMethodInsn(INVOKEINTERFACE, AroundInterceptor.INTERNAL_NAME, THROWN_METHOD_NAME, THROWN_METHOD_DESCRIPTOR, true);
+
+        methodVisitor.visitLabel(tryCatchHelper.getEnd());
+        Label label6 = new Label();
+        methodVisitor.visitJumpInsn(GOTO, label6);
+
+        methodVisitor.visitLabel(tryCatchHelper.getHandler());
+        methodVisitor.visitFrame(Opcodes.F_FULL, 5, new Object[]{"java/lang/Object", "java/lang/Throwable", "[Ljava/lang/Object;", "java/util/Iterator", AroundInterceptor.INTERNAL_NAME}, 1, new Object[]{"java/lang/Throwable"});
+        methodVisitor.visitVarInsn(ASTORE, 5);
+        Label label7 = new Label();
+        methodVisitor.visitLabel(label7);
+        methodVisitor.visitVarInsn(ALOAD, 0);
+        methodVisitor.visitVarInsn(ALOAD, 5);
+        methodVisitor.visitVarInsn(ALOAD, 2);
+        methodVisitor.visitMethodInsn(INVOKESTATIC, ExceptionPublisher.INTERNAL_NAME, ExceptionPublisher.PUBLISH_METHOD_NAME, ExceptionPublisher.PUBLISH_DESCRIPTOR, false);
+
+        methodVisitor.visitLabel(label6);
+        methodVisitor.visitFrame(Opcodes.F_CHOP, 1, null, 0, null);
+        methodVisitor.visitJumpInsn(GOTO, label4);
+
+        methodVisitor.visitLabel(label5);
+        methodVisitor.visitFrame(Opcodes.F_CHOP, 1, null, 0, null);
+        methodVisitor.visitInsn(RETURN);
+
+        Label label8 = new Label();
+        methodVisitor.visitLabel(label8);
+        methodVisitor.visitLocalVariable("t2", "Ljava/lang/Throwable;", null, label7, label6, 5);
+        methodVisitor.visitLocalVariable("ai", "L" + AroundInterceptor.INTERNAL_NAME + ";", null, tryCatchHelper.getStart(), label6, 4);
+        methodVisitor.visitLocalVariable("target", "Ljava/lang/Object;", null, label3, label8, 0);
+        methodVisitor.visitLocalVariable("t", "Ljava/lang/Throwable;", null, label3, label8, 1);
+        methodVisitor.visitLocalVariable("args", "[Ljava/lang/Object;", null, label3, label8, 2);
         methodVisitor.visitMaxs(4, 6);
         methodVisitor.visitEnd();
     }

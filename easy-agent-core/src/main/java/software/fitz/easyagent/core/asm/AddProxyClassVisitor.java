@@ -22,6 +22,7 @@ import static org.objectweb.asm.Opcodes.ACC_STATIC;
 import static org.objectweb.asm.Opcodes.RETURN;
 import static software.fitz.easyagent.api.interceptor.AroundInterceptor.AFTER_METHOD_DESCRIPTOR;
 import static software.fitz.easyagent.api.interceptor.AroundInterceptor.BEFORE_METHOD_DESCRIPTOR;
+import static software.fitz.easyagent.api.interceptor.AroundInterceptor.THROWN_METHOD_DESCRIPTOR;
 
 public class AddProxyClassVisitor extends ClassVisitor {
 
@@ -29,11 +30,13 @@ public class AddProxyClassVisitor extends ClassVisitor {
     private static final String INTERCEPTOR_FIELD_NAME_FORMAT = "$$_easy_agent_interceptor_$$_%d";
     private static final String DELEGATE_BEFORE_FORMAT = "$$_easy_agent_before_$$_%d";
     private static final String DELEGATE_AFTER_FORMAT = "$$_easy_agent_after_$$_%d";
+    private static final String DELEGATE_THROWN_FORMAT = "$$_easy_agent_thrown_$$_%d";
 
     private final long id;
     private final String interceptorFieldName;
     private final String delegateBefore;
     private final String delegateAfter;
+    private final String delegateThrown;
 
     private ClassVisitor cv;
     private InstrumentClass classInfo;
@@ -63,6 +66,7 @@ public class AddProxyClassVisitor extends ClassVisitor {
         this.interceptorFieldName = String.format(INTERCEPTOR_FIELD_NAME_FORMAT, id);
         this.delegateBefore = String.format(DELEGATE_BEFORE_FORMAT, id);
         this.delegateAfter = String.format(DELEGATE_AFTER_FORMAT, id);
+        this.delegateThrown = String.format(DELEGATE_THROWN_FORMAT, id);
     }
 
     @Override
@@ -73,6 +77,7 @@ public class AddProxyClassVisitor extends ClassVisitor {
             cv.visitField(ACC_PRIVATE | ACC_FINAL | ACC_STATIC, interceptorFieldName, "Ljava/util/ArrayList;", "Ljava/util/ArrayList<L" + AroundInterceptor.INTERNAL_NAME + ";>;", null).visitEnd();
             InterceptorByteCodeHelper.generateBeforeDelegateMethod(classInfo, cv, interceptorFieldName, delegateBefore);
             InterceptorByteCodeHelper.generateAfterDelegateMethod(classInfo, cv, interceptorFieldName, delegateAfter);
+            InterceptorByteCodeHelper.generateThrownDelegateMethod(classInfo, cv, interceptorFieldName, delegateThrown);
         }
 
         super.visit(version, access, name, signature, superName, interfaces);
@@ -183,17 +188,7 @@ public class AddProxyClassVisitor extends ClassVisitor {
             mv.visitTypeInsn(ANEWARRAY, "java/lang/Object");
 
             // Store method arguments to array.
-            for (int i=0; i<argCount; i++) {
-                String argDesc = instrumentMethod.getArgTypeDescriptors()[i];
-
-                mv.visitInsn(DUP);
-                mv.visitIntInsn(BIPUSH, i);
-                ByteCodeHelper.loadLocalVariableToStack(mv, i+1, argDesc);
-                if (ClassUtils.isPrimitiveType(argDesc)) {
-                    ByteCodeHelper.boxingPrimitiveType(mv, argDesc);
-                }
-                mv.visitInsn(AASTORE);
-            }
+            generateArgumentsArray();
 
             // Call interceptor before method
             mv.visitMethodInsn(INVOKESTATIC, classInfo.getInternalName(), delegateBefore, BEFORE_METHOD_DESCRIPTOR, false);
@@ -222,35 +217,21 @@ public class AddProxyClassVisitor extends ClassVisitor {
             if (opcode != ATHROW) {
 
                 // Load "this" to stack for call "after" method.
-                // Stack snapshot : [returnedValue, this]
+                // Stack snapshot : [this, returnedValue]
                 mv.visitVarInsn(ALOAD, 0);
 
                 if (opcode == RETURN) {
-                    // Stack snapshot : [this, null]
+                    // Stack snapshot : [null, this]
                     mv.visitInsn(ACONST_NULL);
                 } else {
                     // Swap between "this" and "returnedValue"
-                    // Stack snapshot : [this, returnedValue]
+                    // Stack snapshot : [returnedValue, this]
                     mv.visitInsn(SWAP);
                 }
 
                 // Define array for store method arguments.
-                // Stack snapshot : [this, returnedValue, args]
-                mv.visitIntInsn(BIPUSH, argCount);
-                mv.visitTypeInsn(ANEWARRAY, "java/lang/Object");
-
-                // Store method arguments to array.
-                for (int i = 0; i < argCount; i++) {
-                    String argDesc = instrumentMethod.getArgTypeDescriptors()[i];
-
-                    mv.visitInsn(DUP);
-                    mv.visitIntInsn(BIPUSH, i);
-                    ByteCodeHelper.loadLocalVariableToStack(mv, i + 1, argDesc);
-                    if (ClassUtils.isPrimitiveType(argDesc)) {
-                        ByteCodeHelper.boxingPrimitiveType(mv, argDesc);
-                    }
-                    mv.visitInsn(AASTORE);
-                }
+                // Stack snapshot : [args, returnedValue, this]
+                generateArgumentsArray();
 
                 // Call interceptor before method
                 // Stack snapshot : [returnedValue] -> The final value returned.
@@ -260,12 +241,51 @@ public class AddProxyClassVisitor extends ClassVisitor {
                 if (opcode == RETURN) {
                     mv.visitInsn(POP);
                 }
+            } else {
+                // Method threw an exception
+
+                // Copy throwable for call thrown method.
+                // Stack snapshot : [throwable, throwable]
+                mv.visitInsn(DUP);
+
+                // Load "this" to stack for call "after" method.
+                // Stack snapshot : [this, throwable, throwable]
+                mv.visitVarInsn(ALOAD, 0);
+
+                // Swap top two value between "this" and "throwable"
+                // Stack snapshot : [throwable, this, throwable]
+                mv.visitInsn(SWAP);
+
+                // Define array for store method arguments.
+                // Stack snapshot : [args, throwable, this, throwable] => top three values are used to "thrown" method.
+                generateArgumentsArray();
+
+                // Stack snapshot : [throwable] -> The final value throwable. this value is used to throw.
+                mv.visitMethodInsn(INVOKESTATIC, classInfo.getInternalName(), delegateThrown, THROWN_METHOD_DESCRIPTOR, false);
             }
         }
 
         @Override
         public void visitMaxs(int maxStack, int maxLocals) {
             super.visitMaxs(maxStack + 5, maxLocals);
+        }
+
+        private void generateArgumentsArray() {
+            mv.visitIntInsn(BIPUSH, argCount);
+            mv.visitTypeInsn(ANEWARRAY, "java/lang/Object");
+
+            // Store method arguments to array.
+            for (int i=0; i<argCount; i++) {
+                String argDesc = instrumentMethod.getArgTypeDescriptors()[i];
+
+                mv.visitInsn(DUP);
+                mv.visitIntInsn(BIPUSH, i);
+                ByteCodeHelper.loadLocalVariableToStack(mv, i+1, argDesc);
+                if (ClassUtils.isPrimitiveType(argDesc)) {
+                    ByteCodeHelper.boxingPrimitiveType(mv, argDesc);
+                }
+                mv.visitInsn(AASTORE);
+            }
         }
     }
 }
