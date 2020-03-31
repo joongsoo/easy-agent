@@ -32,10 +32,6 @@ public class NameBaseTransformStrategy implements TransformStrategy {
     public boolean isTransformTarget(ClassLoader loader, String className, Class<?> classBeingRedefined,
                                      ProtectionDomain protectionDomain, byte[] classfileBuffer, String superClassName, String[] interfaces) {
 
-        if (className != null && className.contains("fitz")) {
-            System.err.println(className + " / " + internalClassName);
-        }
-
         return this.internalClassName.equals(className)
                 || (this.applyChild && registerIfChild(internalClassName, superClassName, interfaces));
     }
