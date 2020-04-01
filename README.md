@@ -3,12 +3,11 @@ This library was created to easily develop a Java agent that injects proxy code 
 
 If you write code in Java without needing to know the [bytecode instrumentation](https://docs.oracle.com/javase/8/docs/technotes/guides/instrumentation/index.html), it is injected into bytecode.
 
-Bytecode transforming writed using [ASM](https://asm.ow2.io/). so it is fast.
-
 
 ## Table of content
 - [Summary](#summary)
-- [Documentation](#documentation)
+- [Feature](#feature)
+- [Full Documentation](#full-documentation)
 - [Extend via plugin](#extend-via-plugin)
 - [How to use](#how-to-use)
 - [Example](#example)
@@ -27,17 +26,28 @@ If using java agent, infrastructure dependent logic can be managed at the infras
 
 ![image](https://user-images.githubusercontent.com/15869525/78053714-f41f6c00-73bb-11ea-8ce1-f15fb039bd6e.png)
 
-[easy-agent](https://github.com/joongsoo/easy-agent) helps you develop java agent easily. it is
-- Fast : `easy-agent` uses [ASM](https://asm.ow2.io/), a low-level library.
-- Easy : You don't need to know bytecode transform. You can easily inject a proxy with simple java code.
-- Extension : `easy-agent` provides a `easy-agent-api` that can be easily extended. You can easily develop reusable plugins.
-- Documentation : We try to give you the most detailed and friendly documentation possible. If there is any room for improvement in the document, please make a suggestion.
+[easy-agent](https://github.com/joongsoo/easy-agent) helps you develop java agent easily.
 
-## Documentation
+
+## Feature
+#### Fast
+`easy-agent` uses [ASM](https://asm.ow2.io/), it is low-level library. [ASM](https://asm.ow2.io/) provide high performance.
+
+#### Easy
+You don't need to know bytecode transform. You can easily inject a proxy with simple java code.
+
+#### Extension
+`easy-agent` provides a `easy-agent-api` that can be easily extended. You can easily develop reusable plugins.
+
+#### Documentation
+We try to give you the most detailed and friendly documentation possible. If there is any room for improvement in the document, please make a suggestion.
+
+
+## Full documentation
 If you want see more info about this module, See [Github wiki documentation](https://github.com/joongsoo/easy-agent/wiki)
 
 ## Extend via plugin
-You can developing reusable easy-agent plugin. it is very simple. [See more details](https://github.com/joongsoo/easy-agent/wiki/Plugin)
+You can make reusable easy-agent plugin. it is very simple. [See more details](https://github.com/joongsoo/easy-agent/wiki/Plugin)
 
 ## How to use
 Just follow 6 simple steps.
