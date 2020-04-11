@@ -22,7 +22,7 @@ You will write code to propagate HTTP headers inside your application.
 
 However, if you write like this, your application will depend to [istio](https://istio.io/).
 
-If using java agent, infrastructure dependent logic can be managed at the infrastructure level.
+If using java agent, infrastructure dependent logic can be managed at the infrastructure level. And independence and reusability increase, because it is injected at the infrastructure layer.
 
 ![image](https://user-images.githubusercontent.com/15869525/78053714-f41f6c00-73bb-11ea-8ce1-f15fb039bd6e.png)
 
