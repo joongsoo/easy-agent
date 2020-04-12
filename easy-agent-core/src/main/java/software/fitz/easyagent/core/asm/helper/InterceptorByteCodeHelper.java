@@ -2,6 +2,8 @@ package software.fitz.easyagent.core.asm.helper;
 
 import software.fitz.easyagent.api.interceptor.AroundInterceptor;
 import software.fitz.easyagent.core.interceptor.handler.ExceptionPublisher;
+import software.fitz.easyagent.core.logging.AgentLogger;
+import software.fitz.easyagent.core.logging.AgentLoggerFactory;
 import software.fitz.easyagent.core.model.InstrumentClass;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Label;
@@ -32,10 +34,11 @@ import static software.fitz.easyagent.api.interceptor.AroundInterceptor.THROWN_M
 
 public class InterceptorByteCodeHelper {
 
+    private static final AgentLogger LOGGER = AgentLoggerFactory.getDefaultLogger();
 
     public static void generateBeforeDelegateMethod(InstrumentClass classInfo, ClassVisitor cv, String interceptorFieldName, String delegateMethodName) {
 
-        System.err.println("[EASY_AGENT][" + classInfo.getName() + "] Generate method : " + delegateMethodName);
+        LOGGER.debug("\"" + classInfo.getName() + "\" Generate method : " + delegateMethodName);
 
         MethodVisitor methodVisitor = cv.visitMethod(ACC_PRIVATE | ACC_FINAL | ACC_STATIC | ACC_VARARGS, delegateMethodName, BEFORE_METHOD_DESCRIPTOR, null, null);
         methodVisitor.visitCode();
@@ -115,7 +118,7 @@ public class InterceptorByteCodeHelper {
 
     public static void generateAfterDelegateMethod(InstrumentClass classInfo, ClassVisitor cv, String interceptorFieldName, String delegateMethodName) {
 
-        System.err.println("[EASY_AGENT][" + classInfo.getName() + "] Generate method : " + delegateMethodName);
+        LOGGER.debug("\"" + classInfo.getName() + "\" Generate method : " + delegateMethodName);
 
         MethodVisitor methodVisitor = cv.visitMethod(ACC_PRIVATE | ACC_FINAL | ACC_STATIC | ACC_VARARGS, delegateMethodName, AFTER_METHOD_DESCRIPTOR, null, null);
         methodVisitor.visitCode();
@@ -197,7 +200,7 @@ public class InterceptorByteCodeHelper {
 
     public static void generateThrownDelegateMethod(InstrumentClass classInfo, ClassVisitor cv, String interceptorFieldName, String delegateMethodName) {
 
-        System.err.println("[EASY_AGENT][" + classInfo.getName() + "] Generate method : " + delegateMethodName);
+        LOGGER.debug("\"" + classInfo.getName() + "\" Generate method : " + delegateMethodName);
 
         MethodVisitor methodVisitor = cv.visitMethod(ACC_PRIVATE | ACC_FINAL | ACC_STATIC | ACC_VARARGS, delegateMethodName, THROWN_METHOD_DESCRIPTOR, null, null);
         methodVisitor.visitCode();

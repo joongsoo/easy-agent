@@ -1,6 +1,8 @@
 package software.fitz.easyagent.core;
 
 import software.fitz.easyagent.api.Plugin;
+import software.fitz.easyagent.core.logging.AgentLogger;
+import software.fitz.easyagent.core.logging.AgentLoggerFactory;
 import software.fitz.easyagent.core.transformer.InjectProxyTransformerDelegate;
 import software.fitz.easyagent.core.transformer.TransformerDelegate;
 
@@ -10,6 +12,7 @@ import java.util.List;
 
 public class EasyAgentBootstrap {
 
+    private static final AgentLogger LOGGER = AgentLoggerFactory.getDefaultLogger();
     private static boolean started = false;
 
     private final String agentArgs;
@@ -47,7 +50,7 @@ public class EasyAgentBootstrap {
 
         // 에이전트는 시스템 클래스도 변환할 수 있어야하기에 Bootstrap 클래스로더로 로딩해야한다.
         if (Object.class.getClassLoader() != EasyAgentBootstrap.class.getClassLoader()) {
-            System.err.println("[EASY_AGENT] Invalid jar : Bootstrap class must loaded by bootstrap classloader");
+            LOGGER.error("Invalid jar : Bootstrap class must loaded by bootstrap classloader");
             System.exit(1);
             return;
         }
