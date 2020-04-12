@@ -1,5 +1,6 @@
 package software.fitz.easyagent.core.asm;
 
+import org.objectweb.asm.Type;
 import software.fitz.easyagent.core.asm.helper.InterceptorByteCodeHelper;
 import software.fitz.easyagent.core.asm.helper.ByteCodeHelper;
 import software.fitz.easyagent.api.interceptor.AroundInterceptor;
@@ -73,13 +74,6 @@ public class AddProxyClassVisitor extends ClassVisitor {
     public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
         isInterface = (access & Opcodes.ACC_INTERFACE) != 0;
 
-        if (!isInterface) {
-            cv.visitField(ACC_PRIVATE | ACC_FINAL | ACC_STATIC, interceptorFieldName, "Ljava/util/ArrayList;", "Ljava/util/ArrayList<L" + AroundInterceptor.INTERNAL_NAME + ";>;", null).visitEnd();
-            InterceptorByteCodeHelper.generateBeforeDelegateMethod(classInfo, cv, interceptorFieldName, delegateBefore);
-            InterceptorByteCodeHelper.generateAfterDelegateMethod(classInfo, cv, interceptorFieldName, delegateAfter);
-            InterceptorByteCodeHelper.generateThrownDelegateMethod(classInfo, cv, interceptorFieldName, delegateThrown);
-        }
-
         super.visit(version, access, name, signature, superName, interfaces);
     }
 
@@ -137,6 +131,14 @@ public class AddProxyClassVisitor extends ClassVisitor {
             mv.visitMaxs(0, 0);
             mv.visitEnd();
         }
+
+        if (!isInterface) {
+            cv.visitField(ACC_PRIVATE | ACC_FINAL | ACC_STATIC, interceptorFieldName, "Ljava/util/ArrayList;", "Ljava/util/ArrayList<L" + AroundInterceptor.INTERNAL_NAME + ";>;", null).visitEnd();
+            InterceptorByteCodeHelper.generateBeforeDelegateMethod(classInfo, cv, interceptorFieldName, delegateBefore);
+            InterceptorByteCodeHelper.generateAfterDelegateMethod(classInfo, cv, interceptorFieldName, delegateAfter);
+            InterceptorByteCodeHelper.generateThrownDelegateMethod(classInfo, cv, interceptorFieldName, delegateThrown);
+        }
+
         super.visitEnd();
     }
 
@@ -173,10 +175,12 @@ public class AddProxyClassVisitor extends ClassVisitor {
     private class InjectProxyCodeMethodAdapter extends AdviceAdapter {
         private final InstrumentMethod instrumentMethod;
         private final int argCount;
+        private final String methodName;
 
         protected InjectProxyCodeMethodAdapter(int api, MethodVisitor methodVisitor, int access, String name, String descriptor) {
             super(api, methodVisitor, access, name, descriptor);
             instrumentMethod = new InstrumentMethod(access, name, descriptor, null, null);
+            methodName = name;
             argCount = instrumentMethod.getArgCount();
         }
 
@@ -184,8 +188,9 @@ public class AddProxyClassVisitor extends ClassVisitor {
         protected void onMethodEnter() {
             // Define array for store method arguments.
             mv.visitVarInsn(ALOAD, 0);
-            mv.visitIntInsn(BIPUSH, argCount);
-            mv.visitTypeInsn(ANEWARRAY, "java/lang/Object");
+
+            // Load current method
+            loadCurrentMethodObject();
 
             // Store method arguments to array.
             generateArgumentsArray();
@@ -229,8 +234,15 @@ public class AddProxyClassVisitor extends ClassVisitor {
                     mv.visitInsn(SWAP);
                 }
 
+                // Load current method
+                // Stack snapshot : [method, returnedValue, this]
+                loadCurrentMethodObject();
+
+                // Stack snapshot : [returnedValue, method, this]
+                mv.visitInsn(SWAP);
+
                 // Define array for store method arguments.
-                // Stack snapshot : [args, returnedValue, this]
+                // Stack snapshot : [args, returnedValue, method, this]
                 generateArgumentsArray();
 
                 // Call interceptor before method
@@ -256,8 +268,15 @@ public class AddProxyClassVisitor extends ClassVisitor {
                 // Stack snapshot : [throwable, this, throwable]
                 mv.visitInsn(SWAP);
 
+                // Load current method
+                // Stack snapshot : [method, throwable, this, throwable]
+                loadCurrentMethodObject();
+
+                // Stack snapshot : [throwable, method, this, throwable]
+                mv.visitInsn(SWAP);
+
                 // Define array for store method arguments.
-                // Stack snapshot : [args, throwable, this, throwable] => top three values are used to "thrown" method.
+                // Stack snapshot : [args, throwable, method, this, throwable] => top three values are used to "thrown" method.
                 generateArgumentsArray();
 
                 // Stack snapshot : [throwable] -> The final value throwable. this value is used to throw.
@@ -267,7 +286,30 @@ public class AddProxyClassVisitor extends ClassVisitor {
 
         @Override
         public void visitMaxs(int maxStack, int maxLocals) {
-            super.visitMaxs(maxStack + 5, maxLocals);
+            super.visitMaxs(maxStack + 7, maxLocals);
+        }
+
+        private void loadCurrentMethodObject() {
+            mv.visitLdcInsn(Type.getType("L" + classInfo.getInternalName() + ";"));
+            mv.visitLdcInsn(methodName);
+            mv.visitIntInsn(BIPUSH, argCount);
+            mv.visitTypeInsn(ANEWARRAY, "java/lang/Class");
+
+            for (int i=0; i<argCount; i++) {
+                String argDesc = instrumentMethod.getArgTypeDescriptors()[i];
+
+                mv.visitInsn(DUP);
+                mv.visitIntInsn(BIPUSH, i);
+
+                if (ClassUtils.isPrimitiveType(argDesc)) {
+                    mv.visitFieldInsn(GETSTATIC, ClassUtils.getBoxingInternalName(argDesc), "TYPE", "Ljava/lang/Class;");
+                } else {
+                    mv.visitLdcInsn(Type.getType(argDesc));
+                }
+
+                mv.visitInsn(AASTORE);
+            }
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Class", "getMethod", "(Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;", false);
         }
 
         private void generateArgumentsArray() {

@@ -42,8 +42,6 @@ public class InjectProxyTransformerDelegate implements TransformerDelegate {
 
             List<InterceptorDefinition> interceptorDefinitionList = new ArrayList<>();
 
-            System.err.println("[EASY_AGENT] current thread contextClassLoader : " + Thread.currentThread().getContextClassLoader());
-
             for (InstrumentClass interceptor : transformDefinition.getInterceptorList()) {
 
                 // Reload interceptor class by same classloader as target class.
