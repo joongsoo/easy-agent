@@ -39,7 +39,9 @@ public class ExceptionPublisher {
         for (ExceptionHandler handler : handlerList) {
 
             // Execute only matched interceptor type of handler.
-            if (findExceptionHandlerGenericType(handler.getClass()) == originalInstance.getClass()) {
+            Class<?> exceptionHandlerGenericType = findExceptionHandlerGenericType(handler.getClass());
+            if ((exceptionHandlerGenericType != null && exceptionHandlerGenericType.isAssignableFrom(originalInstance.getClass()))
+                    || exceptionHandlerGenericType == null) {
                 handler.handle(targetObject, targetMethod, originalInstance, t, methodArgs);
             }
         }
@@ -50,7 +52,7 @@ public class ExceptionPublisher {
 
         do {
             for (Type type : c.getGenericInterfaces()) {
-                if (type.getTypeName().startsWith(ExceptionHandler.class.getName())) {
+                if (type.getTypeName().startsWith(ExceptionHandler.class.getName()) && type instanceof ParameterizedType) {
                     return (Class) ((ParameterizedType) type).getActualTypeArguments()[0];
                 }
             }
