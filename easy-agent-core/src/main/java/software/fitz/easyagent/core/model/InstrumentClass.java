@@ -5,10 +5,12 @@ import software.fitz.easyagent.api.util.ClassUtils;
 public class InstrumentClass {
     private String name;
     private String internalName;
+    private String descriptor;
 
     public InstrumentClass(String name, String internalName) {
         this.name = name;
         this.internalName = internalName;
+        this.descriptor = "L" + internalName + ";";
     }
 
     public InstrumentClass(Class<?> clazz) {
@@ -22,6 +24,10 @@ public class InstrumentClass {
 
     public String getInternalName() {
         return internalName;
+    }
+
+    public String getDescriptor() {
+        return descriptor;
     }
 
     public static InstrumentClass fromInternalName(String internalName) {

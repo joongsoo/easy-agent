@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 
 public interface AroundInterceptor {
     String INTERNAL_NAME = "software/fitz/easyagent/api/interceptor/AroundInterceptor";
+    String DESCRIPTOR = "Lsoftware/fitz/easyagent/api/interceptor/AroundInterceptor;";
     String BEFORE_METHOD_NAME = "before";
     String BEFORE_METHOD_DESCRIPTOR = "(Ljava/lang/Object;Ljava/lang/reflect/Method;[Ljava/lang/Object;)[Ljava/lang/Object;";
     String AFTER_METHOD_NAME = "after";
