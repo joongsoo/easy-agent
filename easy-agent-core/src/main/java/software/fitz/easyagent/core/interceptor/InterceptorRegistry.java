@@ -1,31 +1,61 @@
 package software.fitz.easyagent.core.interceptor;
 
 import software.fitz.easyagent.api.interceptor.AroundInterceptor;
+import software.fitz.easyagent.core.model.InterceptorDefinition;
 
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class InterceptorRegistry {
-    public static final String INTERNAL_NAME = "software/fitz/easyagent/core/interceptor/InterceptorRegistry";
 
-    private static final AtomicInteger ID_GENERATOR = new AtomicInteger(0);
-    private static final ConcurrentMap<AroundInterceptor, Integer> INTERCEPTOR_ID_MAP = new ConcurrentHashMap<>();
-    private static final ConcurrentMap<Integer, AroundInterceptor> ID_INTERCEPTOR_MAP = new ConcurrentHashMap<>();
+    private static final AtomicInteger ID = new AtomicInteger(0);
+    private final Map<Integer, InterceptorDefinition> interceptorMap;
+    private final Map<Class<? extends AroundInterceptor>, Class<? extends AroundInterceptor>> interceptorClassMap;
 
-    private InterceptorRegistry() {
+    public InterceptorRegistry() {
+        interceptorMap = new HashMap<>();
+        interceptorClassMap = new HashMap<>();
     }
 
-    public static int register(AroundInterceptor interceptor) {
-
-        return INTERCEPTOR_ID_MAP.computeIfAbsent(interceptor, k -> {
-            int id = ID_GENERATOR.getAndIncrement();
-            ID_INTERCEPTOR_MAP.put(id, k);
-            return id;
-        });
+    public int getNextId() {
+        return ID.getAndIncrement();
     }
 
-    public static AroundInterceptor findInterceptor(int id) {
-        return ID_INTERCEPTOR_MAP.get(id);
+    public int register(InterceptorDefinition interceptor) {
+        int id = ID.getAndIncrement();
+        return register(id, interceptor);
+    }
+
+    public int register(int id, InterceptorDefinition interceptor) {
+        if (interceptorMap.containsKey(id)) {
+            throw new IllegalArgumentException("Key already exists : " + id);
+        }
+
+        interceptorMap.put(id, interceptor);
+        interceptorClassMap.put(interceptor.getReloadedInterceptor().getClass(),
+                interceptor.getOriginalInterceptor().getClass());
+
+        return id;
+    }
+
+    public AroundInterceptor findInterceptor(int id) {
+        InterceptorDefinition interceptorDefinition = interceptorMap.get(id);
+
+        if (interceptorDefinition == null) {
+            throw new IllegalArgumentException("Key " + id + " is not exists.");
+        }
+
+        return interceptorDefinition.getReloadedInterceptor();
+    }
+
+    public Class<? extends AroundInterceptor> findOriginalClass(Class<? extends AroundInterceptor> reloadedClass) {
+        Class<? extends AroundInterceptor> originalClass = interceptorClassMap.get(reloadedClass);
+
+        if (originalClass == null) {
+            throw new IllegalArgumentException("Original class not found.");
+        }
+
+        return originalClass;
     }
 }

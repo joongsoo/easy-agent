@@ -11,13 +11,13 @@ public class TransformDefinition {
     private final String targetMethodName;
     private final List<String> methodArgTypes;
     private final String methodReturnType;
-    private final List<Class<? extends AroundInterceptor>> interceptorList;
+    private final List<AroundInterceptor> interceptorList;
 
     private TransformDefinition(TransformStrategy transformStrategy,
                                 String targetMethodName,
                                 List<String> methodArgTypes,
                                 String methodReturnType,
-                                List<Class<? extends AroundInterceptor>> interceptorList) {
+                                List<AroundInterceptor> interceptorList) {
         this.transformStrategy = transformStrategy;
         this.targetMethodName = targetMethodName;
         this.methodArgTypes = methodArgTypes;
@@ -29,7 +29,7 @@ public class TransformDefinition {
         return transformStrategy;
     }
 
-    public List<Class<? extends AroundInterceptor>> getInterceptorList() {
+    public List<AroundInterceptor> getInterceptorList() {
         return interceptorList;
     }
 
@@ -54,7 +54,7 @@ public class TransformDefinition {
         private String targetMethodName;
         private List<String> methodArgTypes;
         private String methodReturnType;
-        private List<Class<? extends AroundInterceptor>> interceptorList = new ArrayList<>();
+        private List<AroundInterceptor> interceptorList = new ArrayList<>();
 
         public Builder transformStrategy(TransformStrategy transformStrategy) {
             this.transformStrategy = transformStrategy;
@@ -76,7 +76,7 @@ public class TransformDefinition {
             return this;
         }
 
-        public Builder addInterceptor(Class<? extends AroundInterceptor> aroundInterceptor) {
+        public Builder addInterceptor(AroundInterceptor aroundInterceptor) {
             this.interceptorList.add(aroundInterceptor);
             return this;
         }

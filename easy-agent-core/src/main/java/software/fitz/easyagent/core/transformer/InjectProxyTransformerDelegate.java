@@ -20,13 +20,14 @@ import java.util.List;
 
 import static org.objectweb.asm.ClassReader.EXPAND_FRAMES;
 
-
 public class InjectProxyTransformerDelegate implements TransformerDelegate {
 
     private static final AgentLogger LOGGER = AgentLoggerFactory.getDefaultLogger();
-    public static final InjectProxyTransformerDelegate INSTANCE = new InjectProxyTransformerDelegate();
 
-    private InjectProxyTransformerDelegate() {
+    private InterceptorRegistry interceptorRegistry;
+
+    public InjectProxyTransformerDelegate(InterceptorRegistry interceptorRegistry) {
+        this.interceptorRegistry = interceptorRegistry;
     }
 
     @Override
@@ -42,20 +43,25 @@ public class InjectProxyTransformerDelegate implements TransformerDelegate {
 
         try {
             InstrumentClass instrumentClass = InstrumentClass.fromInternalName(internalClassName);
-
             List<InterceptorDefinition> interceptorDefinitionList = new ArrayList<>();
 
-            for (InstrumentClass interceptor : transformDefinition.getInterceptorList()) {
+            for (AroundInterceptor interceptor : transformDefinition.getInterceptorList()) {
+                InstrumentClass interceptorInstClass = InstrumentClass.fromClassName(interceptor.getClass().getName());
 
                 // Reload interceptor class by same classloader as target class.
                 // If target class is loaded by bootstrap classloader, it is replaced application classloader.
                 ClassLoader parent = loader == null ? Thread.currentThread().getContextClassLoader() : loader;
-                AroundInterceptor inst = (AroundInterceptor) AgentClassLoader.of(parent).define(
-                        interceptor.getName(),
+                AroundInterceptor reloadedInterceptor = (AroundInterceptor) AgentClassLoader.of(parent).define(
+                        interceptorInstClass.getName(),
                         protectionDomain).newInstance();
 
-                int id = InterceptorRegistry.register(inst);
-                interceptorDefinitionList.add(new InterceptorDefinition(id, inst, interceptor));
+                int id = interceptorRegistry.getNextId();
+
+                InterceptorDefinition interceptorDefinition = new InterceptorDefinition(id, interceptor,
+                        reloadedInterceptor, interceptorInstClass);
+                interceptorRegistry.register(id, interceptorDefinition);
+
+                interceptorDefinitionList.add(interceptorDefinition);
             }
 
             ClassWriter cw = new ClassWriter(0);

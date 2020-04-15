@@ -3,13 +3,16 @@ package software.fitz.easyagent.core.model;
 import software.fitz.easyagent.api.interceptor.AroundInterceptor;
 
 public class InterceptorDefinition {
+
     private Integer interceptorId;
-    private AroundInterceptor interceptor;
+    private AroundInterceptor originalInterceptor;
+    private AroundInterceptor reloadedInterceptor;
     private InstrumentClass instrumentClass;
 
-    public InterceptorDefinition(Integer interceptorId, AroundInterceptor interceptor, InstrumentClass instrumentClass) {
+    public InterceptorDefinition(Integer interceptorId, AroundInterceptor originalInterceptor, AroundInterceptor reloadedInterceptor, InstrumentClass instrumentClass) {
         this.interceptorId = interceptorId;
-        this.interceptor = interceptor;
+        this.originalInterceptor = originalInterceptor;
+        this.reloadedInterceptor = reloadedInterceptor;
         this.instrumentClass = instrumentClass;
     }
 
@@ -17,8 +20,12 @@ public class InterceptorDefinition {
         return interceptorId;
     }
 
-    public AroundInterceptor getInterceptor() {
-        return interceptor;
+    public AroundInterceptor getOriginalInterceptor() {
+        return originalInterceptor;
+    }
+
+    public AroundInterceptor getReloadedInterceptor() {
+        return reloadedInterceptor;
     }
 
     public InstrumentClass getInstrumentClass() {
