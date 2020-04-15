@@ -34,6 +34,11 @@ If using java agent, infrastructure dependent logic can be managed at the infras
 #### Easy
 You don't need to know bytecode transform. You can easily inject a proxy with simple java code.
 
+#### Productivity
+Productivity is improved by placing infrastructure-dependent code at the infrastructure layer.
+
+You don't have to think about infrastructure when developing and deploying applications. Because the infrastructure-dependent logic is injected by the agent.
+
 #### Extension
 `easy-agent` provides a `easy-agent-api` that can be easily extended. You can easily develop reusable plugins.
 
