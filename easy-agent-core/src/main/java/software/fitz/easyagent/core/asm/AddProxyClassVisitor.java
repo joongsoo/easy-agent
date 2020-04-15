@@ -5,6 +5,8 @@ import software.fitz.easyagent.core.asm.helper.InterceptorByteCodeHelper;
 import software.fitz.easyagent.core.asm.helper.ByteCodeHelper;
 import software.fitz.easyagent.api.interceptor.AroundInterceptor;
 import software.fitz.easyagent.core.interceptor.InterceptorRegistry;
+import software.fitz.easyagent.api.logging.AgentLogger;
+import software.fitz.easyagent.api.logging.AgentLoggerFactory;
 import software.fitz.easyagent.core.model.InstrumentMethod;
 import software.fitz.easyagent.api.util.ClassUtils;
 import software.fitz.easyagent.core.model.InstrumentClass;
@@ -26,6 +28,8 @@ import static software.fitz.easyagent.api.interceptor.AroundInterceptor.BEFORE_M
 import static software.fitz.easyagent.api.interceptor.AroundInterceptor.THROWN_METHOD_DESCRIPTOR;
 
 public class AddProxyClassVisitor extends ClassVisitor {
+
+    private static final AgentLogger LOGGER = AgentLoggerFactory.getDefaultLogger();
 
     private static final AtomicLong ID_GENERATOR = new AtomicLong();
     private static final String INTERCEPTOR_FIELD_NAME_FORMAT = "$$_easy_agent_interceptor_$$_%d";
@@ -81,7 +85,7 @@ public class AddProxyClassVisitor extends ClassVisitor {
     public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
         // static field init
         if (!isInterface && "<clinit>".equals(name) &&  !visitedStaticBlock) {
-            System.err.println("[EASY_AGENT][" + classInfo.getName() + "] Generate static field");
+            LOGGER.debug("\"" + classInfo.getName() + "\" Generate static field");
 
             visitedStaticBlock = true;
             MethodVisitor visitor = cv.visitMethod(access, name, descriptor, signature, exceptions);
@@ -156,7 +160,7 @@ public class AddProxyClassVisitor extends ClassVisitor {
             mv.visitFieldInsn(PUTSTATIC, classInfo.getInternalName(), interceptorFieldName, "Ljava/util/ArrayList;");
 
             for (InterceptorDefinition interceptor : interceptorList) {
-                System.err.println("[EASY_AGENT][" + classInfo.getName() + "] Init interceptor : " + interceptor.getInstrumentClass().getInternalName());
+                LOGGER.debug("\"" + classInfo.getName() + "\" Init interceptor : " + interceptor.getInstrumentClass().getInternalName());
 
                 mv.visitFieldInsn(GETSTATIC, classInfo.getInternalName(), interceptorFieldName, "Ljava/util/ArrayList;");
                 mv.visitIntInsn(BIPUSH, interceptor.getInterceptorId());

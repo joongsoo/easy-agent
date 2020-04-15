@@ -5,6 +5,8 @@ import software.fitz.easyagent.core.classloader.AgentClassLoader;
 import software.fitz.easyagent.core.asm.AddProxyClassVisitor;
 import software.fitz.easyagent.api.interceptor.AroundInterceptor;
 import software.fitz.easyagent.core.interceptor.InterceptorRegistry;
+import software.fitz.easyagent.api.logging.AgentLogger;
+import software.fitz.easyagent.api.logging.AgentLoggerFactory;
 import software.fitz.easyagent.core.model.InstrumentClass;
 import software.fitz.easyagent.core.model.InterceptorDefinition;
 import org.objectweb.asm.ClassReader;
@@ -21,6 +23,7 @@ import static org.objectweb.asm.ClassReader.EXPAND_FRAMES;
 
 public class InjectProxyTransformerDelegate implements TransformerDelegate {
 
+    private static final AgentLogger LOGGER = AgentLoggerFactory.getDefaultLogger();
     public static final InjectProxyTransformerDelegate INSTANCE = new InjectProxyTransformerDelegate();
 
     private InjectProxyTransformerDelegate() {
@@ -35,7 +38,7 @@ public class InjectProxyTransformerDelegate implements TransformerDelegate {
                             ClassReader cr,
                             InternalTransformDefinition transformDefinition) {
 
-        System.err.println("[EASY_AGENT][" + internalClassName + "] matched class. start transforming : " + loader);
+        LOGGER.info("\"" + internalClassName + "\" matched class. start transforming : " + loader);
 
         try {
             InstrumentClass instrumentClass = InstrumentClass.fromInternalName(internalClassName);
