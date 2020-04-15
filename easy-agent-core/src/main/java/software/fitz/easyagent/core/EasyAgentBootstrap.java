@@ -2,8 +2,8 @@ package software.fitz.easyagent.core;
 
 import software.fitz.easyagent.api.Plugin;
 import software.fitz.easyagent.api.interceptor.exception.ExceptionHandler;
-import software.fitz.easyagent.core.logging.AgentLogger;
-import software.fitz.easyagent.core.logging.AgentLoggerFactory;
+import software.fitz.easyagent.api.logging.AgentLogger;
+import software.fitz.easyagent.api.logging.AgentLoggerFactory;
 import software.fitz.easyagent.core.transformer.InjectProxyTransformerDelegate;
 import software.fitz.easyagent.core.transformer.TransformerDelegate;
 

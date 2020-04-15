@@ -2,8 +2,8 @@ package software.fitz.easyagent.core.asm.helper;
 
 import software.fitz.easyagent.api.interceptor.AroundInterceptor;
 import software.fitz.easyagent.core.ExceptionPublisherDelegate;
-import software.fitz.easyagent.core.logging.AgentLogger;
-import software.fitz.easyagent.core.logging.AgentLoggerFactory;
+import software.fitz.easyagent.api.logging.AgentLogger;
+import software.fitz.easyagent.api.logging.AgentLoggerFactory;
 import software.fitz.easyagent.core.model.InstrumentClass;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Label;

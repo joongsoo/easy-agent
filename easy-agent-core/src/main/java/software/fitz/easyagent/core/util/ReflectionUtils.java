@@ -1,9 +1,9 @@
 package software.fitz.easyagent.core.util;
 
+import software.fitz.easyagent.api.logging.AgentLogger;
+import software.fitz.easyagent.api.logging.AgentLoggerFactory;
 import software.fitz.easyagent.api.util.ClassUtils;
 import software.fitz.easyagent.core.classloader.AgentClassLoader;
-import software.fitz.easyagent.core.logging.AgentLogger;
-import software.fitz.easyagent.core.logging.AgentLoggerFactory;
 
 import java.io.IOException;
 import java.lang.reflect.Field;

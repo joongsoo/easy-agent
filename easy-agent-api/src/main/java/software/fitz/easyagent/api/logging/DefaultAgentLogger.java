@@ -1,7 +1,7 @@
 package software.fitz.easyagent.api.logging;
 
-import software.fitz.easyagent.core.common.AgentProperties;
-import software.fitz.easyagent.core.util.DateUtils;
+import software.fitz.easyagent.api.prop.AgentProperties;
+import software.fitz.easyagent.api.util.DateUtils;
 
 import java.io.PrintStream;
 

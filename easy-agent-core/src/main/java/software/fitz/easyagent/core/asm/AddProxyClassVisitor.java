@@ -1,12 +1,12 @@
 package software.fitz.easyagent.core.asm;
 
 import org.objectweb.asm.Type;
+import software.fitz.easyagent.api.logging.AgentLogger;
+import software.fitz.easyagent.api.logging.AgentLoggerFactory;
 import software.fitz.easyagent.core.InterceptorRegistryDelegate;
 import software.fitz.easyagent.core.asm.helper.InterceptorByteCodeHelper;
 import software.fitz.easyagent.core.asm.helper.ByteCodeHelper;
 import software.fitz.easyagent.api.interceptor.AroundInterceptor;
-import software.fitz.easyagent.core.logging.AgentLogger;
-import software.fitz.easyagent.core.logging.AgentLoggerFactory;
 import software.fitz.easyagent.core.model.InstrumentMethod;
 import software.fitz.easyagent.api.util.ClassUtils;
 import software.fitz.easyagent.core.model.InstrumentClass;
