@@ -1,4 +1,4 @@
-package software.fitz.easyagent.core.logging;
+package software.fitz.easyagent.api.logging;
 
 import software.fitz.easyagent.core.common.AgentProperties;
 import software.fitz.easyagent.core.util.DateUtils;

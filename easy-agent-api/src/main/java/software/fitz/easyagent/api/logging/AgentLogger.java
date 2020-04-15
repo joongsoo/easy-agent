@@ -1,4 +1,4 @@
-package software.fitz.easyagent.core.logging;
+package software.fitz.easyagent.api.logging;
 
 public interface AgentLogger {
 
