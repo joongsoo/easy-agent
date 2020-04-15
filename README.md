@@ -24,7 +24,7 @@ However, if you write like this, your application will depend to [istio](https:/
 
 If using java agent, infrastructure dependent logic can be managed at the infrastructure level. And independence and reusability increase, because it is injected at the infrastructure layer.
 
-![image](https://user-images.githubusercontent.com/15869525/78053714-f41f6c00-73bb-11ea-8ce1-f15fb039bd6e.png)
+![image](https://user-images.githubusercontent.com/15869525/79363768-4bf4d000-7f83-11ea-9ead-8a95780d413d.png)
 
 [easy-agent](https://github.com/joongsoo/easy-agent) helps you develop java agent easily.
 
@@ -36,6 +36,8 @@ You don't need to know bytecode transform. You can easily inject a proxy with si
 
 #### Extension
 `easy-agent` provides a `easy-agent-api` that can be easily extended. You can easily develop reusable plugins.
+
+You can see more info in [plugin wiki page](https://github.com/joongsoo/easy-agent/wiki/Plugin).
 
 #### Documentation
 We try to give you the most detailed and friendly documentation possible. If there is any room for improvement in the document, please make a suggestion.
@@ -60,7 +62,7 @@ Just follow 6 simple steps.
 <dependency>
     <groupId>software.fitz</groupId>
     <artifactId>easy-agent-core</artifactId>
-    <version>0.2.0-RELEASE</version>
+    <version>0.3.0-RELEASE</version>
 </dependency>
 ```
 
@@ -71,7 +73,7 @@ Override only necessary methods.
 public class YourInterceptor implements AroundInterceptor {
 
     @Override
-    public Object[] before(Object target, Object[] args) {
+    public Object[] before(Object target, Method targetMethod, Object[] args) {
         // your proxy code
         if (args[0] instanceof String) {
             args[0] = args[0] + " hi"; // possible replace to target method arguments
@@ -80,13 +82,13 @@ public class YourInterceptor implements AroundInterceptor {
     }
 
     @Override
-    public Object after(Object target, Object returnedValue, Object[] args) {
+    public Object after(Object target, Method targetMethod, Object returnedValue, Object[] args) {
         // your proxy code
         return returnedValue; // possible replace to return value
     }
 
     @Override
-    public void thrown(Object target, Throwable t, Object[] args) {
+    public void thrown(Object target, Method targetMethod, Throwable t, Object[] args) {
         // your proxy code
     }
 }
@@ -175,12 +177,14 @@ java -javaagent:/path/{your-agent}.jar -jar target-application.jar
 ### 🚀 Example
 Example of replacing method arguments.
 
+You can see more examples in [wiki page](https://github.com/joongsoo/easy-agent/wiki/Examples).
+
 #### AroundInterceptor
 ```java
 public class YourInterceptor implements AroundInterceptor {
 
     @Override
-    public Object[] before(Object target, Object[] args) {
+    public Object[] before(Object target, Method targetMethod, Object[] args) {
         if (args[0] != null && args[0] instanceof String) {
             args[0] = args[0] + " Hi!";
         }
