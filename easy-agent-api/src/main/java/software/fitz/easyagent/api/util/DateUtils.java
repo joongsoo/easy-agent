@@ -1,4 +1,4 @@
-package software.fitz.easyagent.core.util;
+package software.fitz.easyagent.api.util;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;

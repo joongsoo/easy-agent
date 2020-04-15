@@ -1,6 +1,7 @@
 package software.fitz.easyagent.core;
 
 import software.fitz.easyagent.api.Plugin;
+import software.fitz.easyagent.api.interceptor.exception.ExceptionHandler;
 import software.fitz.easyagent.api.logging.AgentLogger;
 import software.fitz.easyagent.api.logging.AgentLoggerFactory;
 import software.fitz.easyagent.core.transformer.InjectProxyTransformerDelegate;
@@ -18,6 +19,7 @@ public class EasyAgentBootstrap {
     private final String agentArgs;
     private final Instrumentation inst;
     private final List<Plugin> pluginList = new ArrayList<>();
+    private final List<ExceptionHandler> exceptionHandlerList = new ArrayList<>();
 
     public EasyAgentBootstrap(String agentArgs, Instrumentation inst) {
         this.agentArgs = agentArgs;
@@ -34,16 +36,26 @@ public class EasyAgentBootstrap {
         return this;
     }
 
+    public EasyAgentBootstrap addExceptionHandler(ExceptionHandler exceptionHandler) {
+        if (exceptionHandler == null) {
+            throw new NullPointerException("exceptionHandler must not be null!");
+        }
+
+        this.exceptionHandlerList.add(exceptionHandler);
+
+        return this;
+    }
+
     public void start() {
 
         if (inst == null) {
             throw new IllegalStateException("Instrumentation must not be null!");
         }
 
-        start(agentArgs, inst, pluginList);
+        start(agentArgs, inst, pluginList, exceptionHandlerList);
     }
 
-    private static void start(String agentArgs, Instrumentation inst, List<Plugin> pluginList) {
+    private synchronized static void start(String agentArgs, Instrumentation inst, List<Plugin> pluginList, List<ExceptionHandler> exceptionHandlerList) {
         if (started) {
             return;
         }
@@ -55,11 +67,15 @@ public class EasyAgentBootstrap {
             return;
         }
 
-        TransformerDelegate transformerDelegate = InjectProxyTransformerDelegate.INSTANCE;
+        TransformerDelegate transformerDelegate = new InjectProxyTransformerDelegate(InterceptorRegistryDelegate.INTERCEPTOR_REGISTRY);
         TransformerManager transformerManager = TransformerManager.INSTANCE;
 
         for (Plugin plugin : pluginList) {
             plugin.setup(transformerManager);
+        }
+
+        for (ExceptionHandler exceptionHandler : exceptionHandlerList) {
+            ExceptionPublisherDelegate.register(exceptionHandler);
         }
 
         inst.addTransformer(new AgentClassFileTransformer(transformerManager, transformerDelegate), true);

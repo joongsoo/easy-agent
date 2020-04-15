@@ -23,9 +23,13 @@ public class AgentClassLoader extends ClassLoader {
 
     public Class<?> define(String name, byte[] clazz, ProtectionDomain protectionDomain) {
 
-        return CLASS_CACHE.computeIfAbsent(getParent().toString() + "#" + name, k ->
-                defineClass(name, clazz, 0, clazz.length, protectionDomain)
-        );
+        return CLASS_CACHE.computeIfAbsent(getParent().toString() + "#" + name, k -> {
+                    try {
+                        return getParent().loadClass(name);
+                    } catch (ClassNotFoundException e) {
+                        return defineClass(name, clazz, 0, clazz.length, protectionDomain);
+                    }
+                });
     }
 
     public Class<?> define(String name, ProtectionDomain protectionDomain) throws IOException {

@@ -11,7 +11,7 @@ public class TransformerManager implements TransformerRegistry {
 
     static final TransformerManager INSTANCE = new TransformerManager();
 
-    private List<InternalTransformDefinition> transformDefinitionList;
+    private final List<InternalTransformDefinition> transformDefinitionList;
 
     private TransformerManager() {
         this.transformDefinitionList = new CopyOnWriteArrayList<>();

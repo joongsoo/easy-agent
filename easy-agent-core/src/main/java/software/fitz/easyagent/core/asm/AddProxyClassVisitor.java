@@ -1,12 +1,12 @@
 package software.fitz.easyagent.core.asm;
 
 import org.objectweb.asm.Type;
+import software.fitz.easyagent.api.logging.AgentLogger;
+import software.fitz.easyagent.api.logging.AgentLoggerFactory;
+import software.fitz.easyagent.core.InterceptorRegistryDelegate;
 import software.fitz.easyagent.core.asm.helper.InterceptorByteCodeHelper;
 import software.fitz.easyagent.core.asm.helper.ByteCodeHelper;
 import software.fitz.easyagent.api.interceptor.AroundInterceptor;
-import software.fitz.easyagent.core.interceptor.InterceptorRegistry;
-import software.fitz.easyagent.api.logging.AgentLogger;
-import software.fitz.easyagent.api.logging.AgentLoggerFactory;
 import software.fitz.easyagent.core.model.InstrumentMethod;
 import software.fitz.easyagent.api.util.ClassUtils;
 import software.fitz.easyagent.core.model.InstrumentClass;
@@ -164,7 +164,7 @@ public class AddProxyClassVisitor extends ClassVisitor {
 
                 mv.visitFieldInsn(GETSTATIC, classInfo.getInternalName(), interceptorFieldName, "Ljava/util/ArrayList;");
                 mv.visitIntInsn(BIPUSH, interceptor.getInterceptorId());
-                mv.visitMethodInsn(INVOKESTATIC, InterceptorRegistry.INTERNAL_NAME, "findInterceptor", "(I)L" + AroundInterceptor.INTERNAL_NAME + ";", false);
+                mv.visitMethodInsn(INVOKESTATIC, InterceptorRegistryDelegate.INTERNAL_NAME, "findInterceptor", "(I)" + AroundInterceptor.DESCRIPTOR, false);
                 mv.visitMethodInsn(INVOKEVIRTUAL, "java/util/ArrayList", "add", "(Ljava/lang/Object;)Z", false);
                 mv.visitInsn(POP);
             }
@@ -294,7 +294,7 @@ public class AddProxyClassVisitor extends ClassVisitor {
         }
 
         private void loadCurrentMethodObject() {
-            mv.visitLdcInsn(Type.getType("L" + classInfo.getInternalName() + ";"));
+            mv.visitLdcInsn(Type.getType(classInfo.getDescriptor()));
             mv.visitLdcInsn(methodName);
             mv.visitIntInsn(BIPUSH, argCount);
             mv.visitTypeInsn(ANEWARRAY, "java/lang/Class");

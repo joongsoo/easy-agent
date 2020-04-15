@@ -1,4 +1,4 @@
-package software.fitz.easyagent.core.common;
+package software.fitz.easyagent.api.prop;
 
 public class AgentProperties {
 
