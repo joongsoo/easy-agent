@@ -29,7 +29,7 @@ import static software.fitz.easyagent.api.interceptor.AroundInterceptor.THROWN_M
 
 public class AddProxyClassVisitor extends ClassVisitor {
 
-    private static final AgentLogger LOGGER = AgentLoggerFactory.getDefaultLogger();
+    private static final AgentLogger LOGGER = AgentLoggerFactory.getLogger();
 
     private static final AtomicLong ID_GENERATOR = new AtomicLong();
     private static final String INTERCEPTOR_FIELD_NAME_FORMAT = "$$_easy_agent_interceptor_$$_%d";

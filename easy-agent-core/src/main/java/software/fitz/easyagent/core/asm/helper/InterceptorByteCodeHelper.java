@@ -34,7 +34,7 @@ import static software.fitz.easyagent.api.interceptor.AroundInterceptor.THROWN_M
 
 public class InterceptorByteCodeHelper {
 
-    private static final AgentLogger LOGGER = AgentLoggerFactory.getDefaultLogger();
+    private static final AgentLogger LOGGER = AgentLoggerFactory.getLogger();
 
     public static void generateBeforeDelegateMethod(InstrumentClass classInfo, ClassVisitor cv, String interceptorFieldName, String delegateMethodName) {
 

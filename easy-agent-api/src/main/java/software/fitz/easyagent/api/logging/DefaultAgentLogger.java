@@ -1,65 +1,73 @@
 package software.fitz.easyagent.api.logging;
 
+import software.fitz.easyagent.api.logging.appender.LogEvent;
+import software.fitz.easyagent.api.logging.appender.SimpleStreamAppender;
 import software.fitz.easyagent.api.prop.AgentProperties;
 import software.fitz.easyagent.api.util.DateUtils;
 
-import java.io.PrintStream;
+import java.util.Collections;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-public class DefaultAgentLogger implements AgentLogger {
+class DefaultAgentLogger implements AgentLogger {
 
-    private static final String LOG_FORMAT = "[EASY-AGENT][%s][%s] - %s";
+    private static final ExecutorService WRITE_EXECUTOR = Executors.newSingleThreadExecutor();
 
-    private final PrintStream outputStream;
-    private final PrintStream errStream;
+    private Class<?> clazz;
 
     public DefaultAgentLogger() {
-        this(System.out, System.err);
+        this(null);
     }
 
-    public DefaultAgentLogger(PrintStream outputStream, PrintStream errStream) {
-        this.outputStream = outputStream;
-        this.errStream = errStream;
+    public DefaultAgentLogger(Class<?> clazz) {
+        this.clazz = clazz;
+        if (LogAppenderRegistry.getAppenderList() == null) {
+            LogAppenderRegistry.setAppenderList(
+                    Collections.unmodifiableList(Collections.singletonList(new SimpleStreamAppender())));
+        }
     }
 
     @Override
     public void debug(String msg) {
         if (AgentProperties.DEBUG) {
-            outputStream.println(format(LogLevel.DEBUG, msg));
+            LogAppenderRegistry.getAppenderList().forEach(logAppender -> WRITE_EXECUTOR.execute(() -> {
+                logAppender.append(new LogEvent(clazz, msg, DateUtils.currentDateTime(), LogLevel.DEBUG));
+            }));
         }
     }
 
     @Override
     public void info(String msg) {
-        outputStream.println(format(LogLevel.INFO, msg));
+        LogAppenderRegistry.getAppenderList().forEach(logAppender -> WRITE_EXECUTOR.execute(() -> {
+            logAppender.append(new LogEvent(clazz, msg, DateUtils.currentDateTime(), LogLevel.INFO));
+        }));
     }
 
     @Override
     public void warn(String msg) {
-        errStream.println(format(LogLevel.WARN, msg));
+        LogAppenderRegistry.getAppenderList().forEach(logAppender -> WRITE_EXECUTOR.execute(() -> {
+            logAppender.append(new LogEvent(clazz, msg, DateUtils.currentDateTime(), LogLevel.WARN));
+        }));
     }
 
     @Override
     public void warn(String msg, Throwable t) {
-        synchronized (errStream) {
-            errStream.println(format(LogLevel.WARN, msg));
-            t.printStackTrace(errStream);
-        }
+        LogAppenderRegistry.getAppenderList().forEach(logAppender -> WRITE_EXECUTOR.execute(() -> {
+            logAppender.append(new LogEvent(clazz, msg, DateUtils.currentDateTime(), LogLevel.WARN, t));
+        }));
     }
 
     @Override
     public void error(String msg) {
-        errStream.println(format(LogLevel.ERROR, msg));
+        LogAppenderRegistry.getAppenderList().forEach(logAppender -> WRITE_EXECUTOR.execute(() -> {
+            logAppender.append(new LogEvent(clazz, msg, DateUtils.currentDateTime(), LogLevel.ERROR));
+        }));
     }
 
     @Override
     public void error(String msg, Throwable t) {
-        synchronized (errStream) {
-            errStream.println(format(LogLevel.ERROR, msg));
-            t.printStackTrace(errStream);
-        }
-    }
-
-    private String format(LogLevel logLevel, String msg) {
-        return String.format(LOG_FORMAT, DateUtils.currentDateTime(), logLevel, msg);
+        LogAppenderRegistry.getAppenderList().forEach(logAppender -> WRITE_EXECUTOR.execute(() -> {
+            logAppender.append(new LogEvent(clazz, msg, DateUtils.currentDateTime(), LogLevel.ERROR, t));
+        }));
     }
 }

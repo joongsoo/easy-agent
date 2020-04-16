@@ -2,7 +2,6 @@ package software.fitz.easyagent.core.util;
 
 import software.fitz.easyagent.api.logging.AgentLogger;
 import software.fitz.easyagent.api.logging.AgentLoggerFactory;
-import software.fitz.easyagent.api.util.ClassUtils;
 import software.fitz.easyagent.core.classloader.AgentClassLoader;
 
 import java.io.IOException;
@@ -12,7 +11,7 @@ import java.security.ProtectionDomain;
 
 public class ReflectionUtils {
 
-    private static final AgentLogger LOGGER = AgentLoggerFactory.getDefaultLogger();
+    private static final AgentLogger LOGGER = AgentLoggerFactory.getLogger();
 
     public static void copyAllField(Object src, Object target) {
         copyAllField(src, target, true);
