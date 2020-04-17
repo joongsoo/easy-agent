@@ -14,7 +14,7 @@ public class InstrumentClass {
     }
 
     public InstrumentClass(Class<?> clazz) {
-        this.name = clazz.getName();
+        this.name = clazz.getTypeName();
         this.internalName = ClassUtils.toInternalName(name);
     }
 

@@ -8,20 +8,17 @@ import java.util.List;
 
 public class TransformDefinition {
     private final TransformStrategy transformStrategy;
-    private final String targetMethodName;
-    private final List<String> methodArgTypes;
-    private final String methodReturnType;
+    private boolean applyAllMethodInClass;
+    private List<MethodDefinition> targetMethodList;
     private final List<AroundInterceptor> interceptorList;
 
     private TransformDefinition(TransformStrategy transformStrategy,
-                                String targetMethodName,
-                                List<String> methodArgTypes,
-                                String methodReturnType,
+                                boolean applyAllMethodInClass,
+                                List<MethodDefinition> targetMethodList,
                                 List<AroundInterceptor> interceptorList) {
         this.transformStrategy = transformStrategy;
-        this.targetMethodName = targetMethodName;
-        this.methodArgTypes = methodArgTypes;
-        this.methodReturnType = methodReturnType;
+        this.applyAllMethodInClass = applyAllMethodInClass;
+        this.targetMethodList = targetMethodList;
         this.interceptorList = interceptorList;
     }
 
@@ -29,20 +26,16 @@ public class TransformDefinition {
         return transformStrategy;
     }
 
+    public boolean isApplyAllMethodInClass() {
+        return applyAllMethodInClass;
+    }
+
+    public List<MethodDefinition> getTargetMethodList() {
+        return targetMethodList;
+    }
+
     public List<AroundInterceptor> getInterceptorList() {
         return interceptorList;
-    }
-
-    public String getTargetMethodName() {
-        return targetMethodName;
-    }
-
-    public List<String> getMethodArgTypes() {
-        return methodArgTypes;
-    }
-
-    public String getMethodReturnType() {
-        return methodReturnType;
     }
 
     public static Builder builder() {
@@ -51,9 +44,8 @@ public class TransformDefinition {
 
     public static class Builder {
         private TransformStrategy transformStrategy;
-        private String targetMethodName;
-        private List<String> methodArgTypes;
-        private String methodReturnType;
+        private boolean applyAllMethodInClass = false;
+        private List<MethodDefinition> targetMethodList = new ArrayList<>();
         private List<AroundInterceptor> interceptorList = new ArrayList<>();
 
         public Builder transformStrategy(TransformStrategy transformStrategy) {
@@ -61,18 +53,13 @@ public class TransformDefinition {
             return this;
         }
 
-        public Builder targetMethodName(String targetMethodName) {
-            this.targetMethodName = targetMethodName;
+        public Builder applyAllMethodInClass(boolean applyAllMethodInClass) {
+            this.applyAllMethodInClass = applyAllMethodInClass;
             return this;
         }
 
-        public Builder methodArgTypes(List<String> methodArgTypes) {
-            this.methodArgTypes = methodArgTypes;
-            return this;
-        }
-
-        public Builder methodReturnType(String methodReturnType) {
-            this.methodReturnType = methodReturnType;
+        public Builder addTargetMethod(MethodDefinition methodDefinition) {
+            this.targetMethodList.add(methodDefinition);
             return this;
         }
 
@@ -86,16 +73,15 @@ public class TransformDefinition {
                 throw new IllegalStateException("transformStrategy must be not null");
             }
 
-            if (targetMethodName == null) {
-                throw new IllegalStateException("targetMethodName must be not null");
-            }
-
             if (interceptorList.isEmpty()) {
                 throw new IllegalStateException("interceptor is must be at least 1");
             }
 
-            return new TransformDefinition(transformStrategy, targetMethodName,
-                    methodArgTypes, methodReturnType, interceptorList);
+            if (!applyAllMethodInClass && targetMethodList.isEmpty()) {
+                throw new IllegalStateException("targetMethodList is must be at least 1 (or applyAllMethodInClass is active)");
+            }
+
+            return new TransformDefinition(transformStrategy, applyAllMethodInClass, targetMethodList, interceptorList);
         }
     }
 }

@@ -46,7 +46,7 @@ public class InjectProxyTransformerDelegate implements TransformerDelegate {
             List<InterceptorDefinition> interceptorDefinitionList = new ArrayList<>();
 
             for (AroundInterceptor interceptor : transformDefinition.getInterceptorList()) {
-                InstrumentClass interceptorInstClass = InstrumentClass.fromClassName(interceptor.getClass().getName());
+                InstrumentClass interceptorInstClass = InstrumentClass.fromClassName(interceptor.getClass().getTypeName());
 
                 // Reload interceptor class by same classloader as target class.
                 // If target class is loaded by bootstrap classloader, it is replaced application classloader.
@@ -66,17 +66,16 @@ public class InjectProxyTransformerDelegate implements TransformerDelegate {
 
             ClassWriter cw = new ClassWriter(0);
             ClassVisitor cv = new AddProxyClassVisitor(ASMContext.ASM_VERSION, cw, instrumentClass,
-                    transformDefinition.getTargetMethodName(), transformDefinition.getMethodArgTypes(),
-                    transformDefinition.getMethodReturnType(), interceptorDefinitionList);
+                    transformDefinition.getTargetMethodList(),
+                    transformDefinition.isApplyAllMethodInClass(), interceptorDefinitionList);
 
             cr.accept(cv, EXPAND_FRAMES);
 
             return cw.toByteArray();
         } catch (Throwable t) {
             LOGGER.error("Error while converting " + internalClassName, t);
-            System.exit(1);
         }
 
-        throw new Error("No executed it.");
+        return classfileBuffer;
     }
 }

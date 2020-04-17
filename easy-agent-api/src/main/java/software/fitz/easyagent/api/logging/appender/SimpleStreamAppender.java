@@ -54,7 +54,7 @@ public class SimpleStreamAppender implements LogAppender {
             return String.format(LOG_FORMAT,
                     DateUtils.formatYearToMillis(logEvent.getDateTime()), logEvent.getLogLevel(), msg);
         } else {
-            return String.format(LOG_FORMAT_WITH_CLASS, logEvent.getClazz().getName(),
+            return String.format(LOG_FORMAT_WITH_CLASS, logEvent.getClazz().getTypeName(),
                     DateUtils.formatYearToMillis(logEvent.getDateTime()), logEvent.getLogLevel(), msg);
         }
     }

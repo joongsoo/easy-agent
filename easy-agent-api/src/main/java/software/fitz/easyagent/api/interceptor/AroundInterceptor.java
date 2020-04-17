@@ -1,5 +1,8 @@
 package software.fitz.easyagent.api.interceptor;
 
+import software.fitz.easyagent.api.common.NotNull;
+import software.fitz.easyagent.api.common.Nullable;
+
 import java.lang.reflect.Method;
 
 public interface AroundInterceptor {
@@ -17,12 +20,12 @@ public interface AroundInterceptor {
      * This method executed before target method execute.
      * It can replace the method arguments.
      *
-     * @param targetObject Instance of target class.
+     * @param targetObject Instance of target class. If invoke static method, this value is null.
      * @param targetMethod Target method object.
-     * @param args Target method arguments.
+     * @param args Target method arguments. If method not have arguments, this value is empty array.
      * @return Replaced method arguments.
      */
-    default Object[] before(Object targetObject, Method targetMethod, Object[] args) {
+    default Object[] before(@Nullable Object targetObject, @NotNull Method targetMethod, @NotNull Object[] args) {
         return args;
     }
 
@@ -30,13 +33,13 @@ public interface AroundInterceptor {
      * This method executed after target method execute.
      * It can replace the value returned by the target method.
      *
-     * @param targetObject Instance of target class.
+     * @param targetObject Instance of target class. If invoke static method, this value is null.
      * @param targetMethod Target method object.
      * @param returnedValue Value returned from target method.
-     * @param args Target method arguments. If the before method changes the value, it is affected.
+     * @param args Target method arguments. If the before method changes the value, it is affected. And if method not have arguments, this value is empty array.
      * @return Replaced return value.
      */
-    default Object after(Object targetObject, Method targetMethod, Object returnedValue, Object[] args) {
+    default Object after(@Nullable Object targetObject, @NotNull Method targetMethod, @Nullable Object returnedValue, @NotNull Object[] args) {
         return returnedValue;
     }
 
@@ -44,11 +47,11 @@ public interface AroundInterceptor {
      * This method executed on thrown exception in target method.
      * If this method is executed, after is not executed.
      *
-     * @param targetObject Instance of target class.
+     * @param targetObject Instance of target class. If invoke static method, this value is null.
      * @param targetMethod Target method object.
      * @param t Thrown by target method
-     * @param args Target method arguments. If the before method changes the value, it is affected.
+     * @param args Target method arguments. If the before method changes the value, it is affected. And if method not have arguments, this value is empty array.
      */
-    default void thrown(Object targetObject, Method targetMethod, Throwable t, Object[] args) {
+    default void thrown(@Nullable Object targetObject, @NotNull Method targetMethod, @NotNull Throwable t, @Nullable Object[] args) {
     }
 }
