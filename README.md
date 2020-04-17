@@ -47,7 +47,7 @@ You don't have to think about infrastructure when developing and deploying appli
 ### Extension
 `easy-agent` provides a `easy-agent-api` that can be easily extended. You can easily develop reusable plugins.
 
-You can see more info in [plugin wiki page](https://github.com/joongsoo/easy-agent/wiki/Plugin).
+You can see more info in [plugin wiki page](https://github.com/joongsoo/easy-agent/wiki/Make-reusable-plugin).
 
 ### Documentation
 We try to give you the most detailed and friendly documentation possible. If there is any room for improvement in the document, please make a suggestion.
@@ -60,7 +60,7 @@ If you want see more info about this module, See [Github wiki documentation](htt
 <br/>
 
 ## 🚀 Extend via plugin
-You can make reusable easy-agent plugin. it is very simple. [See more details](https://github.com/joongsoo/easy-agent/wiki/Plugin)
+You can make reusable easy-agent plugin. it is very simple. [See more details](https://github.com/joongsoo/easy-agent/wiki/Make-reusable-plugin)
 
 <br/>
 
