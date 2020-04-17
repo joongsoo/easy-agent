@@ -13,7 +13,7 @@ import java.util.List;
 
 public class EasyAgentBootstrap {
 
-    private static final AgentLogger LOGGER = AgentLoggerFactory.getDefaultLogger();
+    private static final AgentLogger LOGGER = AgentLoggerFactory.getLogger();
     private static boolean started = false;
 
     private final String agentArgs;
@@ -60,7 +60,6 @@ public class EasyAgentBootstrap {
             return;
         }
 
-        // 에이전트는 시스템 클래스도 변환할 수 있어야하기에 Bootstrap 클래스로더로 로딩해야한다.
         if (Object.class.getClassLoader() != EasyAgentBootstrap.class.getClassLoader()) {
             LOGGER.error("Invalid jar : Bootstrap class must loaded by bootstrap classloader");
             System.exit(1);

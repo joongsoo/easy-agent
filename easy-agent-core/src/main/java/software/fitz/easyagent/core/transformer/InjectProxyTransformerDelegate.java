@@ -1,7 +1,6 @@
 package software.fitz.easyagent.core.transformer;
 
 import software.fitz.easyagent.core.asm.ASMContext;
-import software.fitz.easyagent.core.classloader.AgentClassLoader;
 import software.fitz.easyagent.core.asm.AddProxyClassVisitor;
 import software.fitz.easyagent.api.interceptor.AroundInterceptor;
 import software.fitz.easyagent.core.interceptor.InterceptorRegistry;
@@ -23,7 +22,7 @@ import static org.objectweb.asm.ClassReader.EXPAND_FRAMES;
 
 public class InjectProxyTransformerDelegate implements TransformerDelegate {
 
-    private static final AgentLogger LOGGER = AgentLoggerFactory.getDefaultLogger();
+    private static final AgentLogger LOGGER = AgentLoggerFactory.getLogger();
 
     private InterceptorRegistry interceptorRegistry;
 
@@ -74,7 +73,7 @@ public class InjectProxyTransformerDelegate implements TransformerDelegate {
 
             return cw.toByteArray();
         } catch (Throwable t) {
-            t.printStackTrace();
+            LOGGER.error("Error while converting " + internalClassName, t);
             System.exit(1);
         }
 
