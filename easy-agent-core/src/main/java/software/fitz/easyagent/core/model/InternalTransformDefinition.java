@@ -1,5 +1,6 @@
 package software.fitz.easyagent.core.model;
 
+import software.fitz.easyagent.api.MethodDefinition;
 import software.fitz.easyagent.api.TransformDefinition;
 import software.fitz.easyagent.api.interceptor.AroundInterceptor;
 import software.fitz.easyagent.api.strategy.TransformStrategy;
@@ -9,33 +10,30 @@ import java.util.List;
 public class InternalTransformDefinition {
 
     private final TransformStrategy transformStrategy;
-    private final String targetMethodName;
-    private final List<String> methodArgTypes;
-    private final String methodReturnType;
+    private final List<MethodDefinition> targetMethodList;
     private final List<AroundInterceptor> interceptorList;
+    private final boolean applyAllMethodInClass;
 
-    public InternalTransformDefinition(TransformStrategy transformStrategy, String targetMethodName, List<String> methodArgTypes, String methodReturnType, List<AroundInterceptor> interceptorList) {
+    public InternalTransformDefinition(TransformStrategy transformStrategy,
+                                       List<MethodDefinition> targetMethodList,
+                                       List<AroundInterceptor> interceptorList,
+                                       boolean applyAllMethodInClass) {
         this.transformStrategy = transformStrategy;
-        this.targetMethodName = targetMethodName;
-        this.methodArgTypes = methodArgTypes;
-        this.methodReturnType = methodReturnType;
+        this.targetMethodList = targetMethodList;
         this.interceptorList = interceptorList;
+        this.applyAllMethodInClass = applyAllMethodInClass;
     }
 
     public TransformStrategy getTransformStrategy() {
         return transformStrategy;
     }
 
-    public String getTargetMethodName() {
-        return targetMethodName;
+    public List<MethodDefinition> getTargetMethodList() {
+        return targetMethodList;
     }
 
-    public List<String> getMethodArgTypes() {
-        return methodArgTypes;
-    }
-
-    public String getMethodReturnType() {
-        return methodReturnType;
+    public boolean isApplyAllMethodInClass() {
+        return applyAllMethodInClass;
     }
 
     public List<AroundInterceptor> getInterceptorList() {
@@ -46,10 +44,9 @@ public class InternalTransformDefinition {
 
         return new InternalTransformDefinition(
                 transformDefinition.getTransformStrategy(),
-                transformDefinition.getTargetMethodName(),
-                transformDefinition.getMethodArgTypes(),
-                transformDefinition.getMethodReturnType(),
-                transformDefinition.getInterceptorList()
+                transformDefinition.getTargetMethodList(),
+                transformDefinition.getInterceptorList(),
+                transformDefinition.isApplyAllMethodInClass()
         );
     }
 }

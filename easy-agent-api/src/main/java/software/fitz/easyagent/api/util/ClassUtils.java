@@ -11,7 +11,7 @@ public class ClassUtils {
     }
 
     public static String toInternalName(Class<?> clazz) {
-        return toInternalName(clazz.getName());
+        return toInternalName(clazz.getTypeName());
     }
 
     public static String toClassName(String internalName) {
@@ -23,8 +23,12 @@ public class ClassUtils {
     }
 
     public static boolean isReturnVoid(String methodDescriptor) {
-        String returnType = methodDescriptor.split("\\)")[1];
+        String returnType = getReturnTypeDescriptor(methodDescriptor);
         return "V".equals(returnType);
+    }
+
+    public static String getReturnTypeDescriptor(String methodDescriptor) {
+        return methodDescriptor.split("\\)")[1];
     }
 
     public static String[] getMethodArgDescriptors(String methodDescriptor) {
@@ -104,14 +108,40 @@ public class ClassUtils {
         throw new IllegalArgumentException("not primitive descriptor : " + descriptor);
     }
 
-    public static String descriptorToInternalName(String descriptor) {
+    public static String unboxing(String internalName) {
 
-        if (descriptor.startsWith("L")) {
-            return descriptor.substring(1, descriptor.length() -1);
-        } else if (descriptor.startsWith("[L")) {
-            return descriptor.substring(2, descriptor.length() -1) + "[]";
+        switch (internalName) {
+            case "java/lang/Integer":
+                return "int";
+            case "java/lang/Boolean":
+                return "boolean";
+            case "java/lang/Character" :
+                return "char";
+            case "java/lang/Byte" :
+                return "byte";
+            case "java/lang/Short" :
+                return "short";
+            case "java/lang/Float" :
+                return "float";
+            case "java/lang/Long" :
+                return "long";
+            case "java/lang/Double" :
+                return "double";
         }
 
-        throw new IllegalArgumentException("descriptor '" + descriptor + "' is not reference type");
+        throw new IllegalArgumentException("not primitive internal name : " + internalName);
+    }
+
+    public static String descriptorToInternalName(String descriptor) {
+
+        if (descriptor.startsWith("L")) { // reference type
+            return descriptor.substring(1, descriptor.length() -1);
+        } else if (descriptor.startsWith("[L")) { // reference type array
+            return descriptor.substring(2, descriptor.length() -1) + "[]";
+        } else if (isPrimitiveType(descriptor)) { // primitive type
+            return unboxing(getBoxingInternalName(descriptor));
+        } else { // primitive type array
+            return unboxing(getBoxingInternalName(String.valueOf(descriptor.charAt(1)))) + "[]";
+        }
     }
 }

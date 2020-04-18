@@ -1,12 +1,14 @@
 package software.fitz.easyagent.core.asm;
 
 import org.objectweb.asm.Type;
+import software.fitz.easyagent.api.MethodDefinition;
 import software.fitz.easyagent.api.logging.AgentLogger;
 import software.fitz.easyagent.api.logging.AgentLoggerFactory;
 import software.fitz.easyagent.core.InterceptorRegistryDelegate;
 import software.fitz.easyagent.core.asm.helper.InterceptorByteCodeHelper;
 import software.fitz.easyagent.core.asm.helper.ByteCodeHelper;
 import software.fitz.easyagent.api.interceptor.AroundInterceptor;
+import software.fitz.easyagent.core.asm.helper.MethodFilter;
 import software.fitz.easyagent.core.model.InstrumentMethod;
 import software.fitz.easyagent.api.util.ClassUtils;
 import software.fitz.easyagent.core.model.InstrumentClass;
@@ -16,6 +18,7 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.commons.AdviceAdapter;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -46,25 +49,22 @@ public class AddProxyClassVisitor extends ClassVisitor {
     private ClassVisitor cv;
     private InstrumentClass classInfo;
     private boolean isInterface;
-    private String methodName;
-    private List<String> methodArgTypes;
-    private String methodReturnType;
+    private List<MethodDefinition> targetMethodList;
+    private boolean applyAllMethodInClass;
     private List<InterceptorDefinition> interceptorList;
     private boolean visitedStaticBlock = false;
 
     public AddProxyClassVisitor(int api,
                                 ClassVisitor cv,
                                 InstrumentClass classInfo,
-                                String methodName,
-                                List<String> methodArgTypes,
-                                String methodReturnType,
+                                List<MethodDefinition> targetMethodList,
+                                boolean applyAllMethodInClass,
                                 List<InterceptorDefinition> interceptorList) {
         super(api, cv);
         this.cv = cv;
         this.classInfo = classInfo;
-        this.methodName = methodName;
-        this.methodArgTypes = methodArgTypes;
-        this.methodReturnType = methodReturnType;
+        this.targetMethodList = targetMethodList;
+        this.applyAllMethodInClass = applyAllMethodInClass;
         this.interceptorList = interceptorList;
 
         this.id = ID_GENERATOR.getAndIncrement();
@@ -94,35 +94,52 @@ public class AddProxyClassVisitor extends ClassVisitor {
         }
 
         // inject interceptor
-        if (!isInterface && isMatchedMethod(name, descriptor)) {
+        if (!isInterface && isMatchedMethod(access, name, descriptor)) {
+            LOGGER.debug("Find matched method : " + name + descriptor);
+
+            boolean isStatic = (access & ACC_STATIC) != 0;
             MethodVisitor visitor = cv.visitMethod(access, name, descriptor, signature, exceptions);
-            return new InjectProxyCodeMethodAdapter(ASMContext.ASM_VERSION, visitor, access, name, descriptor);
+            return new InjectProxyCodeMethodAdapter(ASMContext.ASM_VERSION, visitor, access, name, descriptor, isStatic);
         }
 
         return super.visitMethod(access, name, descriptor, signature, exceptions);
     }
 
-    private boolean isMatchedMethod(String methodName, String methodDescriptor) {
-        boolean matched = this.methodName.equals(methodName);
+    private boolean isMatchedMethod(int access, String methodName, String methodDescriptor) {
 
-        /*
-        TODO : [#1] Support method signature
-        if (this.methodArgTypes != null) {
-            String[] methodParams = ClassUtils.getMethodArgDescriptors(methodDescriptor);
+        // Not apply constructor.
+        if ("<clinit>".equals(methodName) || "<init>".equals(methodName)) {
+            return false;
+        }
 
-            matched &= methodParams.length == this.methodArgTypes.size();
+        if (applyAllMethodInClass) {
+            return true;
+        }
 
-            for(String paramType : methodParams) {
-                if (ClassUtils.isPrimitiveType(paramType)) {
+        String[] argDescriptors = ClassUtils.getMethodArgDescriptors(methodDescriptor);
 
-                } else {
+        for (MethodDefinition definition : this.targetMethodList) {
 
+            if (methodName.equals(definition.getMethodName())) {
+
+                switch (definition.getType()) {
+                    case ALL:
+                        return true;
+                    case ARG:
+                        if (argDescriptors.length == 0 && definition.getArgTypeList().size() == 0) {
+                            return true;
+                        }
+
+                        return MethodFilter.isMatchArgs(Arrays.asList(argDescriptors), definition);
+                    case RETURN_TYPE:
+                        return MethodFilter.isMatchReturnType(methodDescriptor, definition);
+                    case ARG_AND_RETURN_TYPE:
+                        return MethodFilter.isMatchArgsAndReturnType(methodDescriptor, Arrays.asList(argDescriptors), definition);
                 }
             }
         }
-         */
 
-        return matched;
+        return false;
     }
 
     @Override
@@ -180,18 +197,24 @@ public class AddProxyClassVisitor extends ClassVisitor {
         private final InstrumentMethod instrumentMethod;
         private final int argCount;
         private final String methodName;
+        private final boolean isStatic;
 
-        protected InjectProxyCodeMethodAdapter(int api, MethodVisitor methodVisitor, int access, String name, String descriptor) {
+        protected InjectProxyCodeMethodAdapter(int api, MethodVisitor methodVisitor, int access, String name, String descriptor, boolean isStatic) {
             super(api, methodVisitor, access, name, descriptor);
-            instrumentMethod = new InstrumentMethod(access, name, descriptor, null, null);
-            methodName = name;
-            argCount = instrumentMethod.getArgCount();
+            this.instrumentMethod = new InstrumentMethod(access, name, descriptor, null, null);
+            this.methodName = name;
+            this.argCount = instrumentMethod.getArgCount();
+            this.isStatic = isStatic;
         }
 
         @Override
         protected void onMethodEnter() {
-            // Define array for store method arguments.
-            mv.visitVarInsn(ALOAD, 0);
+
+            if (isStatic) {
+                mv.visitInsn(ACONST_NULL);
+            } else {
+                mv.visitVarInsn(ALOAD, 0);
+            }
 
             // Load current method
             loadCurrentMethodObject();
@@ -225,9 +248,13 @@ public class AddProxyClassVisitor extends ClassVisitor {
             // Stack snapshot : [returnedValue]
             if (opcode != ATHROW) {
 
-                // Load "this" to stack for call "after" method.
+                // Load "this" to stack for call "after" method. (if method is static, load null instead of "this")
                 // Stack snapshot : [this, returnedValue]
-                mv.visitVarInsn(ALOAD, 0);
+                if (isStatic) {
+                    mv.visitInsn(ACONST_NULL);
+                } else {
+                    mv.visitVarInsn(ALOAD, 0);
+                }
 
                 if (opcode == RETURN) {
                     // Stack snapshot : [null, this]
@@ -264,9 +291,13 @@ public class AddProxyClassVisitor extends ClassVisitor {
                 // Stack snapshot : [throwable, throwable]
                 mv.visitInsn(DUP);
 
-                // Load "this" to stack for call "after" method.
+                // Load "this" to stack for call "after" method. (if method is static, load null instead of "this")
                 // Stack snapshot : [this, throwable, throwable]
-                mv.visitVarInsn(ALOAD, 0);
+                if (isStatic) {
+                    mv.visitInsn(ACONST_NULL);
+                } else {
+                    mv.visitVarInsn(ALOAD, 0);
+                }
 
                 // Swap top two value between "this" and "throwable"
                 // Stack snapshot : [throwable, this, throwable]

@@ -52,7 +52,7 @@ public class ExceptionPublisher {
 
         do {
             for (Type type : c.getGenericInterfaces()) {
-                if (type.getTypeName().startsWith(ExceptionHandler.class.getName()) && type instanceof ParameterizedType) {
+                if (type.getTypeName().startsWith(ExceptionHandler.class.getTypeName()) && type instanceof ParameterizedType) {
                     return (Class) ((ParameterizedType) type).getActualTypeArguments()[0];
                 }
             }
