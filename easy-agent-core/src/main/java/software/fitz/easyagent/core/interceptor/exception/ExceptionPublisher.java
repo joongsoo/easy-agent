@@ -3,7 +3,7 @@ package software.fitz.easyagent.core.interceptor.exception;
 import software.fitz.easyagent.api.interceptor.exception.ExceptionHandler;
 import software.fitz.easyagent.api.interceptor.AroundInterceptor;
 import software.fitz.easyagent.core.InterceptorRegistryDelegate;
-import software.fitz.easyagent.core.util.ReflectionUtils;
+import software.fitz.easyagent.api.util.ReflectionUtils;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;

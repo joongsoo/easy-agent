@@ -12,7 +12,8 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 import software.fitz.easyagent.core.model.InternalTransformDefinition;
-import software.fitz.easyagent.core.util.ReflectionUtils;
+import software.fitz.easyagent.core.util.ClassLoaderUtils;
+import software.fitz.easyagent.api.util.ReflectionUtils;
 
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
@@ -51,7 +52,7 @@ public class InjectProxyTransformerDelegate implements TransformerDelegate {
                 // Reload interceptor class by same classloader as target class.
                 // If target class is loaded by bootstrap classloader, it is replaced application classloader.
                 ClassLoader parent = loader == null ? Thread.currentThread().getContextClassLoader() : loader;
-                Class reloadedClass = ReflectionUtils.reloadClass(interceptorInstClass.getName(), parent, protectionDomain);
+                Class reloadedClass = ClassLoaderUtils.reloadClass(interceptorInstClass.getName(), parent, protectionDomain);
                 AroundInterceptor reloadedInterceptor = (AroundInterceptor) ReflectionUtils.newInstance(reloadedClass);
                 ReflectionUtils.copyAllField(interceptor, reloadedInterceptor);
 
