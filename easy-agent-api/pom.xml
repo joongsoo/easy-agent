@@ -5,12 +5,12 @@
     <parent>
         <groupId>software.fitz</groupId>
         <artifactId>easy-agent</artifactId>
-        <version>0.3.0-RELEASE</version>
+        <version>0.4.0-RELEASE</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>easy-agent-api</artifactId>
-    <version>0.3.0-RELEASE</version>
+    <version>0.4.0-RELEASE</version>
     <packaging>jar</packaging>
 
     <build>
