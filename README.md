@@ -129,7 +129,7 @@ public class PremainClass {
 
     public static void premain(String agentArgs, Instrumentation instrumentation) {
 
-        new EasyAgentBootstrap(agentArgs, instrumentation)
+        EasyAgentBootstrap.initialize(agentArgs, instrumentation)
                 .addPlugin(new YourPlugin())
                 .start();
     }
