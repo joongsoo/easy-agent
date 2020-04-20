@@ -3,10 +3,11 @@ This library was created to easily develop a Java agent that injects proxy code 
 
 If you write code in Java without needing to know the [bytecode instrumentation](https://docs.oracle.com/javase/8/docs/technotes/guides/instrumentation/index.html), it is injected into bytecode.
 
+If you want see more info about this framework, See [Github wiki documentation](https://github.com/joongsoo/easy-agent/wiki)
+
 ## Table of content
 - [Summary](#-summary)
 - [Feature](#-feature)
-- [Full Documentation](#-full-documentation)
 - [Extend via plugin](#-extend-via-plugin)
 - [Quick start](#-quick-start)
 - [Example](#-example)
@@ -47,20 +48,15 @@ You don't have to think about infrastructure when developing and deploying appli
 ### Extension
 `easy-agent` provides a `easy-agent-api` that can be easily extended. You can easily develop reusable plugins.
 
-You can see more info in [plugin wiki page](https://github.com/joongsoo/easy-agent/wiki/4.-Plugin).
+You can see more info in [plugin wiki page](https://github.com/joongsoo/easy-agent/wiki/5.-Plugin).
 
 ### Documentation
 We try to give you the most detailed and friendly documentation possible. If there is any room for improvement in the document, please make a suggestion.
 
 <br/>
 
-## 🚀 Full documentation
-If you want see more info about this module, See [Github wiki documentation](https://github.com/joongsoo/easy-agent/wiki)
-
-<br/>
-
 ## 🚀 Extend via plugin
-You can make reusable easy-agent plugin. it is very simple. [See more details](https://github.com/joongsoo/easy-agent/wiki/4.-Plugin)
+You can make reusable easy-agent plugin. it is very simple. [See more details](https://github.com/joongsoo/easy-agent/wiki/5.-Plugin)
 
 <br/>
 
@@ -187,7 +183,7 @@ java -javaagent:/path/{your-agent}.jar -jar target-application.jar
 ## 🚀 Example
 Example of replacing method arguments.
 
-You can see more examples in [wiki page](https://github.com/joongsoo/easy-agent/wiki/Examples).
+You can see more examples in [wiki page](https://github.com/joongsoo/easy-agent/wiki/6.-Examples).
 
 #### AroundInterceptor
 ```java
