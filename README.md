@@ -8,7 +8,7 @@ If you write code in Java without needing to know the [bytecode instrumentation]
 - [Feature](#-feature)
 - [Full Documentation](#-full-documentation)
 - [Extend via plugin](#-extend-via-plugin)
-- [How to use](#-how-to-use)
+- [Quick start](#-quick-start)
 - [Example](#-example)
 
 <br/>
@@ -64,7 +64,7 @@ You can make reusable easy-agent plugin. it is very simple. [See more details](h
 
 <br/>
 
-## 🚀 How to use
+## 🚀 Quick start
 Just follow 6 simple steps.
 
 #### (1) Add maven dependency to pom.xml
@@ -115,7 +115,7 @@ public class YourPlugin implements Plugin {
                 TransformDefinition.builder()
                         // "+" means applies to all classes that extend this class
                         .transformStrategy(TransformStrategy.className("package.Class+")) 
-                        .targetMethodName("methodName")
+                        .matchArgs(MethodDefinition.all("targetMethodName"))
                         .addInterceptor(YourInterceptor.class)
                         .build()
         );
@@ -215,7 +215,7 @@ public class YourPlugin implements Plugin {
         transformerRegistry.register(
                 TransformDefinition.builder()
                         .transformStrategy(TransformStrategy.className("package.TargetClass")) 
-                        .targetMethodName("printName")
+                        .addTargetMethod(matchArgs("printName", String.class))
                         .addInterceptor(YourInterceptor.class)
                         .build()
         );
